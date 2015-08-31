@@ -6,6 +6,7 @@ using System.Text;
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using OSGeo.OSR;
+using Driver = OSGeo.GDAL.Driver;
 
 namespace RasterizeCsharp
 {
@@ -36,8 +37,8 @@ namespace RasterizeCsharp
             string outputFile = "test.tif";
 
 
-            int x_res = (int)(envelope.MaxX - envelope.MinX) / pixel_size;
-            int y_res = (int)(envelope.MaxY - envelope.MinY) / pixel_size;
+            int x_res = (int)(envelope.MaxX - envelope.MinX) / 149; //  int x_res = (int)(envelope.MaxX - envelope.MinX) / pixel_size;
+            int y_res = (int)(envelope.MaxY - envelope.MinY) / 188; //  int y_res = (int)(envelope.MaxY - envelope.MinY) / pixel_size;
 
 
             string input_srs;
@@ -49,24 +50,29 @@ namespace RasterizeCsharp
             //Console.WriteLine("Extent: " + envelope.MaxX + " " + envelope.MinX + " " + envelope.MaxY + " " + envelope.MinY);
             Console.WriteLine("X resolution: " + x_res);
             Console.WriteLine("X resolution: " + y_res);
-
-            /*
+            
+            
             string[] options;
             options = new string[] { "BLOCKXSIZE=" + 100, "BLOCKYSIZE=" + 10 };
-            Dataset outputDataset = Gdal.GetDriverByName("GTiff").Create(outputFile, x_res, y_res, 1, DataType.GDT_UInt16, options);
-            Band band = outputDataset.GetRasterBand(1);
-            band.SetNoDataValue(NoData_value);
+            Driver outputDriver = Gdal.GetDriverByName("GTiff");
+            Dataset outputDataset = outputDriver.Create(outputFile, x_res, y_res, 1, DataType.GDT_Int16, null);
 
-
-
-
-
+            
             //Define spatial reference 
             SpatialReference spatialReference = layer.GetSpatialRef();
             string srs_wkt;
             spatialReference.ExportToWkt(out srs_wkt);
             outputDataset.SetProjection(srs_wkt);
-            */
+
+            double[] argin = new double[] { 228650, 149, 0, 4653538, 0,-188 };
+            outputDataset.SetGeoTransform(argin);
+
+            Band band = outputDataset.GetRasterBand(1);
+            band.SetNoDataValue(NoData_value);
+            
+            outputDataset.FlushCache();
+            outputDataset.Dispose();
+            
 
             int[] bandlist = new int[] { 1 };
 
