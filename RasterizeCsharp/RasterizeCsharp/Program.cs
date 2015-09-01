@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using OSGeo.OSR;
@@ -84,13 +80,13 @@ namespace RasterizeCsharp
             //myDataset.SetProjection(srs_wkt);
 
             string[] rasterizeOptions;
-            rasterizeOptions = new string[] { "ATTRIBUTE=Shape_Area" };
+            rasterizeOptions = new string[] { "ALL_TOUCHED=TRUE","ATTRIBUTE=Shape_Area"};
 
             //Rasterize
             //Gdal.RasterizeLayer(outputDataset,0, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 0, null, null, null, null); //Working
 
-            Gdal.RasterizeLayer(myDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, null, null, null);
-
+            Gdal.RasterizeLayer(myDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, rasterizeOptions, null, null);
+            
 
 
             //Gdal.RasterizeLayer(outputDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero,1,burnValues, null, null, null);
