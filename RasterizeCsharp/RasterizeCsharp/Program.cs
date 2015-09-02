@@ -75,7 +75,7 @@ namespace RasterizeCsharp
             spatialReference.ExportToWkt(out srs_wkt);
             outputDataset.SetProjection(srs_wkt);
 
-            double[] argin = new double[] { envelope.MinX, pixelSize, 0, envelope.MaxY, 0, -pixelSize };
+            double[] argin = new double[] { envelope.MinX, pixelSize, 0, envelope.MaxY, 0,-pixelSize };
             outputDataset.SetGeoTransform(argin);
 
             Band band = outputDataset.GetRasterBand(1);
@@ -91,7 +91,7 @@ namespace RasterizeCsharp
 
             double[] burnValues = new double[] { 10.0 };
 
-            Dataset myDataset = Gdal.Open("test.tif", Access.GA_Update);
+            Dataset myDataset = Gdal.Open(outputFile, Access.GA_Update);
             //myDataset.SetProjection(srs_wkt);
 
             string[] rasterizeOptions;
