@@ -2,7 +2,6 @@
 
 using ESRI.ArcGIS.ConversionTools;
 using ESRI.ArcGIS.Geoprocessor;
-
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using OSGeo.OSR;
@@ -16,8 +15,15 @@ namespace RasterizeCsharp
         {
             Program program = new Program();
 
-            program.VectorToRasterFromGdal();
-            // program.VectorToRasterFromEsri();
+            //program.VectorToRasterFromGdal();
+
+
+            string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\UtahBoundary.shp";
+            string fieldName = "Shape_Area";
+            string outRasterName = @"D:\Ashis_Work\GDAL Utilities\sample-data\Utah_ESRI_30m.tif";
+            int rasterCellSize = 30;
+
+            program.VectorToRasterFromEsri(inputShapeFile, outRasterName, fieldName, rasterCellSize);
 
 
         }
@@ -95,7 +101,7 @@ namespace RasterizeCsharp
             //myDataset.SetProjection(srs_wkt);
 
             string[] rasterizeOptions;
-           // rasterizeOptions = new string[] { "ALL_TOUCHED=TRUE", "ATTRIBUTE=Shape_Area" };
+           // rasterizeOptions = new string[] { "ALL_TOUCHED=TRUE", "ATTRIBUTE=Shape_Area" }; //To set all touched pixels into raster pixel
 
             rasterizeOptions = new string[] { "ATTRIBUTE=Shape_Area" };
 
@@ -118,18 +124,28 @@ namespace RasterizeCsharp
 
         }
 
-        public void VectorToRasterFromEsri()
+        public void VectorToRasterFromEsri(string inputFeature,string outRaster,string fieldName, int cellSize)
         {
-            
-            Geoprocessor geoprocessor = new Geoprocessor();
-            
-            PolygonToRaster polygonToRaster = new PolygonToRaster();
-            //polygonToRaster.
+            try
+            {
+                //Runtime manager to find the ESRI product installed in the system
+                ESRI.ArcGIS.RuntimeManager.Bind(ESRI.ArcGIS.ProductCode.Desktop);
 
+                Geoprocessor geoprocessor = new Geoprocessor();
+                geoprocessor.OverwriteOutput = true;
+                
+                FeatureToRaster featureToRaster = new FeatureToRaster();
+                featureToRaster.cell_size = cellSize;
+                featureToRaster.in_features = inputFeature;
+                featureToRaster.out_raster = outRaster;
+                featureToRaster.field = fieldName;
 
-            geoprocessor.Execute(polygonToRaster,null);
+                geoprocessor.Execute(featureToRaster, null);
 
-
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
 
         }
 
