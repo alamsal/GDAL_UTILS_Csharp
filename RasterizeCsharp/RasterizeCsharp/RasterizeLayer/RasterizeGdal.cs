@@ -84,8 +84,29 @@ namespace RasterizeCsharp.RasterizeLayer
 
             //Rasterize layer
             //Gdal.RasterizeLayer(myDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, null, null, null); // To burn the given burn values instead of feature attributes
-            Gdal.RasterizeLayer(myDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, rasterizeOptions, null, null);
+            Gdal.RasterizeLayer(myDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, rasterizeOptions, new Gdal.GDALProgressFuncDelegate(ProgressFunc), "Raster conversion");
 
         }
+
+        private static int ProgressFunc(double complete, IntPtr message, IntPtr data)
+        {
+           Console.Write("Processing ... " + complete * 100 + "% Completed.");
+	       if (message != IntPtr.Zero)
+	       {
+               Console.Write(" Message:" + System.Runtime.InteropServices.Marshal.PtrToStringAnsi(message));
+	       }
+            
+	       if (data != IntPtr.Zero)
+	       {
+               Console.Write(" Data:" + System.Runtime.InteropServices.Marshal.PtrToStringAnsi(data));
+	       }
+       
+            Console.WriteLine("");
+            return 1;
+        }
+
+
+
+
     }
 }
