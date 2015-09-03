@@ -21,7 +21,7 @@ namespace RasterizeCsharp
             string outRasterNameGdal = @"D:\Ashis_Work\GDAL Utilities\sample-data\Utah_gdal_30m.tif";
             int rasterCellSize = 30;
 
-            //program.VectorToRasterFromEsri(inputShapeFile, outRasterNameEsri, fieldName, rasterCellSize);
+            program.VectorToRasterFromEsri(inputShapeFile, outRasterNameEsri, fieldName, rasterCellSize);
             program.VectorToRasterFromGdal(inputShapeFile, outRasterNameGdal, fieldName, rasterCellSize);
 
         }
@@ -46,8 +46,6 @@ namespace RasterizeCsharp
             //Compute the out raster cell resolutions
             int x_res = Convert.ToInt32((envelope.MaxX - envelope.MinX) / rasterCellSize);
             int y_res = Convert.ToInt32((envelope.MaxY - envelope.MinY) / rasterCellSize);
-
-            Console.WriteLine("");
 
             Console.WriteLine("Extent: " + envelope.MaxX + " " + envelope.MinX + " " + envelope.MaxY + " " + envelope.MinY);
             Console.WriteLine("X resolution: " + x_res);
@@ -99,10 +97,11 @@ namespace RasterizeCsharp
 
             string[] rasterizeOptions;
             //rasterizeOptions = new string[] { "ALL_TOUCHED=TRUE", "ATTRIBUTE=Shape_Area" }; //To set all touched pixels into raster pixel
-            rasterizeOptions = new string[] { "ATTRIBUTE=Shape_Area" };
+
+            rasterizeOptions = new string[] { "ATTRIBUTE="+fieldName };
 
             //Rasterize layer
-            //Gdal.RasterizeLayer(myDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, null, null, null); // To burn the given burn values instead attributes
+            //Gdal.RasterizeLayer(myDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, null, null, null); // To burn the given burn values instead of feature attributes
             Gdal.RasterizeLayer(myDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, rasterizeOptions, null, null);
 
         }
