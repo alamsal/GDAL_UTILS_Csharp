@@ -1,5 +1,6 @@
 ﻿using System;
 using RasterizeCsharp.RasterizeLayer;
+using RasterizeCsharp.ZonalStatistics;
 
 namespace RasterizeCsharp
 {
@@ -14,7 +15,15 @@ namespace RasterizeCsharp
             int rasterCellSize = 30;
 
             //SharpRasterizeLayer.VectorToRasterFromEsri(inputShapeFile, outRasterNameEsri, fieldName, rasterCellSize);
-            SharpRasterizeLayer.VectorToRasterFromGdal(inputShapeFile, outRasterNameGdal, fieldName, rasterCellSize);
+            //SharpRasterizeLayer.VectorToRasterFromGdal(inputShapeFile, outRasterNameGdal, fieldName, rasterCellSize);
+
+            string goldStandardRaster =@"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\Whetstone_20080229eDOQQMos.tif";
+            string goldStandardVector = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev05.shp";
+            string goldStandarOutputraster = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev05.tif";
+
+            //SharpRasterizeLayer.VectorToRasterFromGdal(goldStandardVector,goldStandarOutputraster,"Id",3);
+            ComputeStatistics.ReadValueAndZoneRasters(goldStandardRaster, goldStandardRaster);
+            
 
             Console.ReadLine();
 
