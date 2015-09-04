@@ -78,7 +78,7 @@ namespace RasterizeCsharp.RasterizeLayer
             //additional options
 
             string[] rasterizeOptions;
-            //rasterizeOptions = new string[] { "ALL_TOUCHED=TRUE", "ATTRIBUTE=Shape_Area" }; //To set all touched pixels into raster pixel
+            //rasterizeOptions = new string[] { "ALL_TOUCHED=TRUE", "ATTRIBUTE=" + fieldName }; //To set all touched pixels into raster pixel
 
             rasterizeOptions = new string[] { "ATTRIBUTE=" + fieldName };
 

@@ -6,7 +6,7 @@ namespace RasterizeCsharp.ZonalStatistics
 {
     class ComputeStatistics
     {
-        private Dictionary<string, List<double>> zonalValues;
+        private static Dictionary<int, List<double>> zonalValues = new Dictionary<int, List<double>>();
 
         public static void ReadValueAndZoneRasters(string valueRasterName,string zoneRasterName)
         {
@@ -19,7 +19,7 @@ namespace RasterizeCsharp.ZonalStatistics
             if(valueRasterInfo.RasterHeight!=zoneRasterInfo.RasterHeight || valueRasterInfo.RasterWidth != zoneRasterInfo.RasterWidth)
             {
                 Console.WriteLine("Given input rasters have inconsistant width or height");
-                System.Environment.Exit(-1);
+                //System.Environment.Exit(-1);
             }else
             {
                 CalculateZonalStatistics(ref valueRaster,ref zoneRaster,valueRasterInfo);
@@ -34,10 +34,22 @@ namespace RasterizeCsharp.ZonalStatistics
             {
                 for (int row = 0; row < rasterInfo.RasterHeight; row++)
                 {
-                    double rasterPixelValue = valueRaster[col + row * rasterInfo.RasterWidth];
-                    Console.WriteLine(rasterPixelValue + " X: " + col + " Y:" + row);
+                    int zoneRasterPixelValue = Convert.ToInt32(zoneRaster[col + row * rasterInfo.RasterWidth]);
+                    double valueRasterPixelValue = valueRaster[col + row * rasterInfo.RasterWidth];
+
+                    //Console.WriteLine(rasterPixelValue + " X: " + col + " Y:" + row);
+
+                   if(zonalValues.ContainsKey(zoneRasterPixelValue))
+                   {
+                       zonalValues[zoneRasterPixelValue].Add(valueRasterPixelValue);
+                   }else
+                   {
+                       zonalValues.Add(zoneRasterPixelValue,new List<double>(){valueRasterPixelValue});
+                   }
                 }
             }
+
+            Console.WriteLine(zonalValues);
         }
 
         private static RasterInfo GetRasterValue(string rasterName, out double[] rasterValues)
