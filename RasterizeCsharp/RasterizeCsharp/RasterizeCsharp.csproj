@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ZonalIO\StatisticsExport.cs" />
     <Compile Include="RasterizeLayer\RasterizeEsri.cs" />
     <Compile Include="RasterizeLayer\RasterizeGdal.cs" />
     <Compile Include="VectorToRaster.cs" />

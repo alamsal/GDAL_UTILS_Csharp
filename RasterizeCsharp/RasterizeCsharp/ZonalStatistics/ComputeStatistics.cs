@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+
 using OSGeo.GDAL;
+
+using RasterizeCsharp.ZonalIO;
 
 namespace RasterizeCsharp.ZonalStatistics
 {
     class ComputeStatistics
     {
-        private static Dictionary<int, List<double>> zonalValues = new Dictionary<int, List<double>>();
+        //Dictionary<int, List<double>> zonalValues = new Dictionary<int, List<double>>();
+        
+        private static Dictionary<int, List<double>> _zonalValues;
 
         public static void ReadValueAndZoneRasters(string valueRasterName,string zoneRasterName)
         {
@@ -22,13 +28,15 @@ namespace RasterizeCsharp.ZonalStatistics
                 //System.Environment.Exit(-1);
             }else
             {
-                CalculateZonalStatistics(ref valueRaster,ref zoneRaster,valueRasterInfo);
+                CalculateZonalStatistics(ref valueRaster,ref zoneRaster,valueRasterInfo, out _zonalValues );
             }
 
         }
 
-        private static void CalculateZonalStatistics(ref double[] valueRaster, ref double []zoneRaster, RasterInfo rasterInfo)
+        private static void CalculateZonalStatistics(ref double[] valueRaster, ref double[] zoneRaster, RasterInfo rasterInfo, out Dictionary<int, List<double>> zonalValues)
         {
+            zonalValues = new Dictionary<int, List<double>>();
+            Console.WriteLine("Calculating zonal statistics ...");
             //Do data processing for raster
             for (int col = 0; col < rasterInfo.RasterWidth; col++)
             {
@@ -49,14 +57,9 @@ namespace RasterizeCsharp.ZonalStatistics
                 }
             }
 
-            Console.WriteLine(zonalValues);
-
-
-
-
-
-
-
+           // Console.WriteLine(zonalValues);
+            StatisticsExport writer = new StatisticsExport("mytest.csv");
+            writer.WriteZonalStatistics(ref zonalValues);
 
         }
 
@@ -109,6 +112,7 @@ namespace RasterizeCsharp.ZonalStatistics
 
         }
 
+        
         
     }
 }
