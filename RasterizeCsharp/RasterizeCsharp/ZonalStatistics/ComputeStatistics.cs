@@ -10,8 +10,8 @@ namespace RasterizeCsharp.ZonalStatistics
 
         public static void ReadValueAndZoneRasters(string valueRasterName,string zoneRasterName)
         {
-            double[] valueRaster;
-            double[] zoneRaster;
+            double [] valueRaster;
+            double [] zoneRaster;
 
             RasterInfo valueRasterInfo = GetRasterValue(valueRasterName, out valueRaster);
             RasterInfo zoneRasterInfo = GetRasterValue(zoneRasterName, out zoneRaster);
@@ -50,6 +50,14 @@ namespace RasterizeCsharp.ZonalStatistics
             }
 
             Console.WriteLine(zonalValues);
+
+
+
+
+
+
+
+
         }
 
         private static RasterInfo GetRasterValue(string rasterName, out double[] rasterValues)

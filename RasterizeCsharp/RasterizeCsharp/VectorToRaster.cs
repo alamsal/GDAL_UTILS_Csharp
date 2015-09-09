@@ -18,6 +18,7 @@ namespace RasterizeCsharp
             //SharpRasterizeLayer.VectorToRasterFromGdal(inputShapeFile, outRasterNameGdal, fieldName, rasterCellSize);
 
             string goldStandardRaster =@"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\Whetstone_20080229eDOQQMos.tif";
+            string croppedGoldStandardRaster = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\maskedout__1tif.tif";
             string goldStandardVector = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev05.shp";
             string goldStandarZoneraster = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev05.tif";
 
@@ -30,16 +31,18 @@ namespace RasterizeCsharp
             SharpRasterizeLayer.VectorToRasterFromGdal(goldStandardVector, goldStandarZoneraster, fieldName, rasterCellSize);
             //ComputeStatistics.ReadValueAndZoneRasters(outRasterNameGdal, outRasterNameGdal);
 
-            ComputeStatistics.ReadValueAndZoneRasters(goldStandardRaster, goldStandarZoneraster);
+             */
 
-            */
+            ComputeStatistics.ReadValueAndZoneRasters(croppedGoldStandardRaster, goldStandarZoneraster);
+
+            /*
 
 
             SharpRasterizeLayer.VectorToRasterFromGdal(inputShapeFile, outRasterNameGdal, fieldName, rasterCellSize);
             SharpRasterizeLayer.VectorToRasterFromGdal(inputShapeFile, outRasterNameEsri, fieldName, rasterCellSize);
 
             ComputeStatistics.ReadValueAndZoneRasters(outRasterNameEsri, outRasterNameGdal);
-
+            */
 
 
             Console.ReadLine();
