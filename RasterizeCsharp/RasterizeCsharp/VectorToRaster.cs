@@ -45,7 +45,7 @@ namespace RasterizeCsharp
             */
 
 
-            Console.ReadLine();
+          //  Console.ReadLine();
 
         }
 
