@@ -13,14 +13,15 @@ namespace RasterizeCsharp.ZonalIO
             _csvFileName = csvFileName;
         }
 
-        public void WriteZonalStatistics(ref Dictionary<int, List<double>> zonalValues)
+        public void ExportZonalStatistics(ref Dictionary<int, List<double>> zonalValues)
         {
             Console.WriteLine("Exporting zonal statistics in csv...");
             using(var w = new StreamWriter(_csvFileName))
             {
                 string csvHeader = string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12}", "VALUE", "COUNT","AREA","MIN", "MAX", "RANGE", "MEAN", "STDEV", "SUM", "VARIETY", "MAJORITY","MINORITY","MEDIAN");
                 w.WriteLine(csvHeader);
-
+                w.Flush();
+                
                 foreach (KeyValuePair<int, List<double>> zoneValue in zonalValues)
                 {
                     //zonal variables
@@ -48,17 +49,11 @@ namespace RasterizeCsharp.ZonalIO
 
                     w.WriteLine(csvLine);
                     w.Flush();
-
-
-
-
-                    //Console.WriteLine(zoneValue.Key + " " + zoneValue.Value.Count + " " + zoneValue.Value.Sum(sum => Convert.ToDouble(sum)) + " "+ zoneValue.Value.Min(min => Convert.ToDouble(min))  );
-
                 }
             }
         }
 
-        private double GetMedian(IEnumerable<double> source)
+        private static double GetMedian(IEnumerable<double> source)
         {
             var sortedList = from number in source
                              orderby number

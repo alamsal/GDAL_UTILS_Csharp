@@ -59,7 +59,7 @@ namespace RasterizeCsharp.ZonalStatistics
 
            // Console.WriteLine(zonalValues);
             StatisticsExport writer = new StatisticsExport("mytest.csv");
-            writer.WriteZonalStatistics(ref zonalValues);
+            writer.ExportZonalStatistics(ref zonalValues);
 
         }
 
