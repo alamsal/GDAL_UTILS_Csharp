@@ -4,15 +4,15 @@ using RasterizeCsharp.ZonalStatistics;
 
 namespace RasterizeCsharp
 {
-    class VectorToRaster
+    class RsacGdalUtils
     {
         static void Main(string[] args)
         {
-            string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev03.shp";
+            string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev05.shp";
             string fieldName = "Id";
-            string outRasterNameEsri = @"D:\Ashis_Work\GDAL Utilities\sample-data\Utah_ESRI_30m.tif";
-            string outRasterNameGdal = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev03_gdal.tif";
-            int rasterCellSize = 30;
+            string outRasterNameEsri = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev05_esri.tif";
+            string outRasterNameGdal = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev05_gdal2.tif";
+            const int rasterCellSize = 100;
 
             //SharpRasterizeLayer.VectorToRasterFromEsri(inputShapeFile, outRasterNameEsri, fieldName, rasterCellSize);
             SharpRasterizeLayer.VectorToRasterFromGdal(inputShapeFile, outRasterNameGdal, fieldName, rasterCellSize);
@@ -33,7 +33,7 @@ namespace RasterizeCsharp
 
              */
 
-            //ComputeStatistics.ReadValueAndZoneRasters(croppedGoldStandardRaster, goldStandarZoneraster);
+            ComputeStatistics.ReadValueAndZoneRasters(croppedGoldStandardRaster, goldStandarZoneraster);
 
             /*
 
