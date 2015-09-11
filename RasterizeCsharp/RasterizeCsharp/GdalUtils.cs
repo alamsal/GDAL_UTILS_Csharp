@@ -4,7 +4,7 @@ using RasterizeCsharp.ZonalStatistics;
 
 namespace RasterizeCsharp
 {
-    class VectorToRaster
+    class RsacGdalUtils
     {
         static void Main(string[] args)
         {
