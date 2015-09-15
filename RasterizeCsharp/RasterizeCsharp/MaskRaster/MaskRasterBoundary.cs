@@ -12,9 +12,8 @@ namespace RasterizeCsharp.MaskRaster
     {
         public static void AlignRaster(string featureName, string rasterName, int rasterCellSize)
         {
-           
             
-            //vector operations
+            //Register vector drivers
             Ogr.RegisterAll();
 
             //Reading the vector data
@@ -25,28 +24,25 @@ namespace RasterizeCsharp.MaskRaster
             string inputShapeSrs;
             SpatialReference spatialRefrence = layer.GetSpatialRef();
             spatialRefrence.ExportToWkt(out inputShapeSrs);
-
-
-            string outputRasterFile = "myraster_reproject.tif";
             
-           
             Envelope envelope = new Envelope();
             layer.GetExtent(envelope, 0);
 
             //Compute the out raster cell resolutions
             int x_res = Convert.ToInt32((envelope.MaxX - envelope.MinX) / rasterCellSize);
             int y_res = Convert.ToInt32((envelope.MaxY - envelope.MinY) / rasterCellSize);
-
-
-            //raster operations
+            
+            //Register vector drivers
             Gdal.AllRegister();
             
             Dataset oldRasterDataset = Gdal.Open(rasterName, Access.GA_ReadOnly);
-
-            string oldRasterSrs = oldRasterDataset.GetProjection();
-            
+           
             //Create new tiff 
             OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("GTiff");
+            
+            //New geotiff name
+            string outputRasterFile = "mynewraster.tif";
+
             Dataset outputDataset = outputDriver.Create(outputRasterFile, x_res,y_res, 1, DataType.GDT_Float64, null);
             
             //Geotransform
@@ -62,12 +58,11 @@ namespace RasterizeCsharp.MaskRaster
             string[] reprojectOptions = {"NUM_THREADS = ALL_CPUS"," INIT_DEST = NO_DATA","WRITE_FLUSH = YES" };
 
             Gdal.ReprojectImage(oldRasterDataset, outputDataset, null, inputShapeSrs, ResampleAlg.GRA_NearestNeighbour, 1.0,1.0, null, null, reprojectOptions);
-
+            
+            //flush cache
             outputDataset.FlushCache();
             band.FlushCache();
             dataSource.FlushCache();
-
-
             
         }
     }

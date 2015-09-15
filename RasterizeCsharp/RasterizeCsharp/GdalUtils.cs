@@ -37,19 +37,20 @@ namespace RasterizeCsharp
 
              */
 
-            ComputeStatistics.ReadValueAndZoneRasters(croppedGoldStandardRaster, goldStandarZoneraster);
+            //ComputeStatistics.ReadValueAndZoneRasters(croppedGoldStandardRaster, goldStandarZoneraster);
 
             
 
 
-            SharpRasterizeLayer.VectorToRasterFromGdal(inputShapeFile, outRasterNameGdal, fieldName, rasterCellSize);
-            SharpRasterizeLayer.VectorToRasterFromGdal(inputShapeFile, outRasterNameEsri, fieldName, rasterCellSize);
+            //SharpRasterizeLayer.VectorToRasterFromGdal(inputShapeFile, outRasterNameGdal, fieldName, rasterCellSize);
+           // SharpRasterizeLayer.VectorToRasterFromGdal(inputShapeFile, outRasterNameEsri, fieldName, rasterCellSize);
 
-            ComputeStatistics.ReadValueAndZoneRasters(outRasterNameEsri, outRasterNameGdal);
+           // ComputeStatistics.ReadValueAndZoneRasters(outRasterNameEsri, outRasterNameGdal);
             
-
-
-            MaskRasterBoundary.AlignRaster(inputShapeFile, goldStandardRaster,rasterCellSize);
+            string aRaster = @"C:\Users\aashislamsal\Downloads\qgis_sample_data\qgis_sample_data\raster\SR_50M_alaska_nad.tif";
+            string aShape = @"C:\Users\aashislamsal\Downloads\qgis_sample_data\qgis_sample_data\shapefiles\alaska.shp";
+            int aCellsize = 1000;
+            MaskRasterBoundary.AlignRaster(aShape, aRaster, aCellsize);
 
 
           //  Console.ReadLine();
