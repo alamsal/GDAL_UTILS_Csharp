@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using OSGeo.GDAL;
-
+using RasterizeCsharp.AppConstants;
 using RasterizeCsharp.ZonalIO;
 
 namespace RasterizeCsharp.ZonalStatistics
