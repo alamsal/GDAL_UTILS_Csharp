@@ -55,13 +55,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MaskRaster\MaskRasterBoundary.cs" />
     <Compile Include="ZonalIO\StatisticsExport.cs" />
     <Compile Include="RasterizeLayer\RasterizeEsri.cs" />
     <Compile Include="RasterizeLayer\RasterizeGdal.cs" />
@@ -70,17 +66,6 @@
     <Compile Include="RasterizeLayer\SharpRasterizeLayer.cs" />
     <Compile Include="ZonalStatistics\ComputeStatistics.cs" />
     <Compile Include="ZonalStatistics\RasterInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <COMReference Include="stdole">
-      <Guid>{00020430-0000-0000-C000-000000000046}</Guid>
-      <VersionMajor>2</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
