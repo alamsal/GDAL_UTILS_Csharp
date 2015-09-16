@@ -49,6 +49,21 @@ namespace RasterizeCsharp.ZonalStatistics
             RasterInfo valueRasterInfo = GetRasterValue2(ref valueRasterDataset, out valueRaster);
             RasterInfo zoneRasterInfo = GetRasterValue2(ref zoneRasterDataset, out zoneRaster);
 
+
+
+            //
+            OSGeo.GDAL.Driver driver = Gdal.GetDriverByName("GTiff");
+
+            driver.CreateCopy("valueRaster.tif", valueRasterDataset, 0, null, null, null);
+            driver.CreateCopy("zoneRaster.tif", zoneRasterDataset, 0, null, null, null);
+
+
+
+
+
+            valueRasterDataset.FlushCache();
+            zoneRasterDataset.FlushCache();
+
             if (valueRasterInfo.RasterHeight != zoneRasterInfo.RasterHeight || valueRasterInfo.RasterWidth != zoneRasterInfo.RasterWidth)
             {
                 Console.WriteLine("Given input rasters have inconsistant width or height");

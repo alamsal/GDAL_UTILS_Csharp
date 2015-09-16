@@ -51,12 +51,12 @@ namespace RasterizeCsharp.MaskRaster
             
             //Set no data
             Band band = outAlignedRaster.GetRasterBand(1);
-            band.SetNoDataValue(RsacAppConstants.NO_DATA_VALUE);
+            band.SetNoDataValue(RsacAppConstants.NoDataValue);
             outAlignedRaster.SetProjection(inputShapeSrs);
 
             string[] reprojectOptions = {"NUM_THREADS = ALL_CPUS"," INIT_DEST = NO_DATA","WRITE_FLUSH = YES" };
 
-            Gdal.ReprojectImage(oldRasterDataset, outAlignedRaster, null, inputShapeSrs, ResampleAlg.GRA_NearestNeighbour, 1.0, 1.0, null, null, reprojectOptions);
+            Gdal.ReprojectImage(oldRasterDataset, outAlignedRaster, null, inputShapeSrs, ResampleAlg.GRA_NearestNeighbour,0.0, 0.0, null, null, reprojectOptions);
             
             //flush cache
             band.FlushCache();

@@ -13,7 +13,7 @@ namespace RasterizeCsharp
             string fieldName = "Id";
             string outRasterNameEsri = @"D:\Ashis_Work\GDAL Utilities\sample-data\Utah_ESRI_30m.tif";
             string outRasterNameGdal = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev03_gdal.tif";
-            int rasterCellSize = 30;
+            int rasterCellSize =30;
 
             //SharpRasterizeLayer.VectorToRasterFromEsri(inputShapeFile, outRasterNameEsri, fieldName, rasterCellSize);
             //SharpRasterizeLayer.VectorToRasterFromGdal(inputShapeFile, outRasterNameGdal, fieldName, rasterCellSize);
@@ -31,33 +31,8 @@ namespace RasterizeCsharp
 
             ComputeStatistics.ComputeZonalStatistics(goldStandardRaster,inputShapeFile,fieldName,rasterCellSize);
 
-            // Gold standard
-            /*
-            fieldName = "Id";
-            rasterCellSize = 3;
-
-            SharpRasterizeLayer.VectorToRasterFromGdal(goldStandardVector, goldStandarZoneraster, fieldName, rasterCellSize);
-            //ComputeStatistics.ReadValueAndZoneRasters(outRasterNameGdal, outRasterNameGdal);
-
-             */
-
-            //ComputeStatistics.ReadValueAndZoneRasters(croppedGoldStandardRaster, goldStandarZoneraster);
 
             
-
-
-            //SharpRasterizeLayer.VectorToRasterFromGdal(inputShapeFile, outRasterNameGdal, fieldName, rasterCellSize);
-           // SharpRasterizeLayer.VectorToRasterFromGdal(inputShapeFile, outRasterNameEsri, fieldName, rasterCellSize);
-
-           // ComputeStatistics.ReadValueAndZoneRasters(outRasterNameEsri, outRasterNameGdal);
-            
-            string aRaster = @"C:\Users\aashislamsal\Downloads\qgis_sample_data\qgis_sample_data\raster\SR_50M_alaska_nad.tif";
-            string aShape = @"C:\Users\aashislamsal\Downloads\qgis_sample_data\qgis_sample_data\shapefiles\alaska.shp";
-            int aCellsize = 1000;
-            
-           // MaskRasterBoundary.ClipRaster(aShape, aRaster, aCellsize);
-
-
           //  Console.ReadLine();
 
         }
