@@ -14,8 +14,6 @@ namespace RasterizeCsharp.ZonalStatistics
 {
     class ComputeStatistics
     {
-        //Dictionary<int, List<double>> zonalValues = new Dictionary<int, List<double>>();
-        
         private static Dictionary<int, List<double>> _zonalValues;
 
         /*

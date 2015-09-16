@@ -8,6 +8,6 @@
 
     public static class RsacAppConstants
     {
-        public const double NoDataValue = -9;
+        public const double NoDataValue = -99999.9;
     }
 }
