@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using OSGeo.OGR;
+using OSGeo.OSR;
 using OSGeo.GDAL;
+
 using RasterizeCsharp.AppConstants;
 using RasterizeCsharp.ZonalIO;
+using RasterizeCsharp.RasterizeLayer;
+using RasterizeCsharp.MaskRaster;
 
 namespace RasterizeCsharp.ZonalStatistics
 {
@@ -13,6 +18,7 @@ namespace RasterizeCsharp.ZonalStatistics
         
         private static Dictionary<int, List<double>> _zonalValues;
 
+        /*
         public static void ReadValueAndZoneRasters(string valueRasterName,string zoneRasterName)
         {
             double [] valueRaster;
@@ -27,12 +33,50 @@ namespace RasterizeCsharp.ZonalStatistics
                 //System.Environment.Exit(-1);
             }else
             {
-                CalculateZonalStatistics(ref valueRaster,ref zoneRaster,valueRasterInfo, out _zonalValues );
+                PrepareForStatistics(ref valueRaster,ref zoneRaster,valueRasterInfo, out _zonalValues );
             }
 
         }
+        */
 
-        private static void CalculateZonalStatistics(ref double[] valueRaster, ref double[] zoneRaster, RasterInfo rasterInfo, out Dictionary<int, List<double>> zonalValues)
+        public static void ValueAndZoneRasters(ref Dataset valueRasterDataset, ref Dataset zoneRasterDataset)
+        {
+
+
+            double[] valueRaster;
+            double[] zoneRaster;
+
+            RasterInfo valueRasterInfo = GetRasterValue2(ref valueRasterDataset, out valueRaster);
+            RasterInfo zoneRasterInfo = GetRasterValue2(ref zoneRasterDataset, out zoneRaster);
+
+            if (valueRasterInfo.RasterHeight != zoneRasterInfo.RasterHeight || valueRasterInfo.RasterWidth != zoneRasterInfo.RasterWidth)
+            {
+                Console.WriteLine("Given input rasters have inconsistant width or height");
+                //System.Environment.Exit(-1);
+            }
+            else
+            {
+                PrepareForStatistics(ref valueRaster, ref zoneRaster, valueRasterInfo, out _zonalValues);
+            }
+        }
+
+        public static void ComputeZonalStatistics(string valueRasterName,string featureName, string featureFieldName, int cellSize)
+        {
+            //Step 1: Convert feature to raster
+            //Step 2: Align/mask value raster with step1's output raster
+            //Setp 3: Feed into ..
+
+            Dataset alignedValueRaster;
+            Dataset zoneRaster;
+
+            RasterizeGdal.Rasterize(featureName, out zoneRaster, featureFieldName, cellSize);
+            MaskRasterBoundary.ClipRaster(featureName, valueRasterName, cellSize, out alignedValueRaster);
+
+            ValueAndZoneRasters(ref alignedValueRaster, ref zoneRaster);
+
+        }
+
+        private static void PrepareForStatistics(ref double[] valueRaster, ref double[] zoneRaster, RasterInfo rasterInfo, out Dictionary<int, List<double>> zonalValues)
         {
             zonalValues = new Dictionary<int, List<double>>();
             Console.WriteLine("Calculating zonal statistics ...");
@@ -61,7 +105,27 @@ namespace RasterizeCsharp.ZonalStatistics
             writer.ExportZonalStatistics(ref zonalValues);
 
         }
+        
+        private static RasterInfo GetRasterValue2(ref Dataset rasterDataset, out double[] rasterValues)
+        {
+            //raster size
+            int rasterCols = rasterDataset.RasterXSize;
+            int rasterRows = rasterDataset.RasterYSize;
 
+            //Read 1st band from raster
+            Band band = rasterDataset.GetRasterBand(1);
+            int rastWidth = rasterCols;
+            int rastHeight = rasterRows;
+
+            //Need to find out algorithm to read memory block by block instead of reading a big chunk of data
+            rasterValues = new double[rastWidth * rastHeight];
+            band.ReadRaster(0, 0, rastWidth, rastHeight, rasterValues, rastWidth, rastHeight, 0, 0);
+
+            var info = new RasterInfo { RasterHeight = rasterRows, RasterWidth = rasterCols };
+            return info;
+        }
+        
+        /*
         private static RasterInfo GetRasterValue(string rasterName, out double[] rasterValues)
         {
             //Register all drivers
@@ -110,7 +174,7 @@ namespace RasterizeCsharp.ZonalStatistics
             return info;
 
         }
-
+        */
         
         
     }

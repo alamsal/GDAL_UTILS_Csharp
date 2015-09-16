@@ -10,15 +10,14 @@ namespace RasterizeCsharp.MaskRaster
 {
     class MaskRasterBoundary
     {
-        public static void AlignRaster(string featureName, string rasterName, int rasterCellSize)
+        public static void ClipRaster(string featureName, string rasterName, int rasterCellSize, out Dataset outAlignedRaster)
         {
-            
             //Register vector drivers
             Ogr.RegisterAll();
 
             //Reading the vector data
-            DataSource dataSource = Ogr.Open(featureName, 0);
-            Layer layer = dataSource.GetLayerByIndex(0);
+            DataSource vectorDataSource = Ogr.Open(featureName, 0);
+            Layer layer = vectorDataSource.GetLayerByIndex(0);
 
             //Extrac srs from input feature 
             string inputShapeSrs;
@@ -38,31 +37,31 @@ namespace RasterizeCsharp.MaskRaster
             Dataset oldRasterDataset = Gdal.Open(rasterName, Access.GA_ReadOnly);
            
             //Create new tiff 
-            OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("GTiff");
+            OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("MEM");
             
             //New geotiff name
-            string outputRasterFile = "mynewraster.tif";
+            //string outputRasterFile = "mynewraster.tif";
 
-            Dataset outputDataset = outputDriver.Create(outputRasterFile, x_res,y_res, 1, DataType.GDT_Float64, null);
+            outAlignedRaster = outputDriver.Create("", x_res, y_res, 1, DataType.GDT_Float64, null);
             
             //Geotransform
             double[] argin = new double[] { envelope.MinX, rasterCellSize, 0, envelope.MaxY, 0, -rasterCellSize };
-            outputDataset.SetGeoTransform(argin);
+            outAlignedRaster.SetGeoTransform(argin);
 
             
             //Set no data
-            Band band = outputDataset.GetRasterBand(1);
+            Band band = outAlignedRaster.GetRasterBand(1);
             band.SetNoDataValue(RsacAppConstants.NO_DATA_VALUE);
-            outputDataset.SetProjection(inputShapeSrs);
+            outAlignedRaster.SetProjection(inputShapeSrs);
 
             string[] reprojectOptions = {"NUM_THREADS = ALL_CPUS"," INIT_DEST = NO_DATA","WRITE_FLUSH = YES" };
 
-            Gdal.ReprojectImage(oldRasterDataset, outputDataset, null, inputShapeSrs, ResampleAlg.GRA_NearestNeighbour, 1.0,1.0, null, null, reprojectOptions);
+            Gdal.ReprojectImage(oldRasterDataset, outAlignedRaster, null, inputShapeSrs, ResampleAlg.GRA_NearestNeighbour, 1.0, 1.0, null, null, reprojectOptions);
             
             //flush cache
-            outputDataset.FlushCache();
             band.FlushCache();
-            dataSource.FlushCache();
+            vectorDataSource.FlushCache();
+            oldRasterDataset.FlushCache();
             
         }
     }

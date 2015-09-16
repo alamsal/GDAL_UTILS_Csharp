@@ -9,7 +9,7 @@ namespace RasterizeCsharp
     {
         static void Main(string[] args)
         {
-            string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev03.shp";
+            string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev05.shp";
             string fieldName = "Id";
             string outRasterNameEsri = @"D:\Ashis_Work\GDAL Utilities\sample-data\Utah_ESRI_30m.tif";
             string outRasterNameGdal = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev03_gdal.tif";
@@ -26,6 +26,10 @@ namespace RasterizeCsharp
             string goldStandardVector = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev05.shp";
             string goldStandarZoneraster = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev05.tif";
 
+
+
+
+            ComputeStatistics.ComputeZonalStatistics(goldStandardRaster,inputShapeFile,fieldName,rasterCellSize);
 
             // Gold standard
             /*
@@ -50,7 +54,8 @@ namespace RasterizeCsharp
             string aRaster = @"C:\Users\aashislamsal\Downloads\qgis_sample_data\qgis_sample_data\raster\SR_50M_alaska_nad.tif";
             string aShape = @"C:\Users\aashislamsal\Downloads\qgis_sample_data\qgis_sample_data\shapefiles\alaska.shp";
             int aCellsize = 1000;
-            MaskRasterBoundary.AlignRaster(aShape, aRaster, aCellsize);
+            
+           // MaskRasterBoundary.ClipRaster(aShape, aRaster, aCellsize);
 
 
           //  Console.ReadLine();
