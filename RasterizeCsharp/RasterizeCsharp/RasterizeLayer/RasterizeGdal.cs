@@ -1,20 +1,18 @@
 ﻿using System;
-using System.IO;
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using OSGeo.OSR;
+using RasterizeCsharp.AppUtils;
 
 namespace RasterizeCsharp.RasterizeLayer
 {
     class RasterizeGdal
     {
-        public static void Rasterize(string inputFeature, string outRaster, string fieldName, int cellSize)
+        public static void Rasterize(string inputFeature, out Dataset outputDataset, string fieldName, int cellSize)
         {
             // Define pixel_size and NoData value of new raster
             int rasterCellSize = cellSize;
-            const double noDataValue = -9999;
-            string outputRasterFile = outRaster;
-
+            
             //Register the vector drivers
             Ogr.RegisterAll();
 
@@ -36,15 +34,9 @@ namespace RasterizeCsharp.RasterizeLayer
             //Register the raster drivers
             Gdal.AllRegister();
 
-            //Check if output raster exists & delete (optional)
-            if (File.Exists(outputRasterFile))
-            {
-                File.Delete(outputRasterFile);
-            }
-
-            //Create new tiff 
-            OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("GTiff");
-            Dataset outputDataset = outputDriver.Create(outputRasterFile, x_res, y_res, 1, DataType.GDT_Float64, null);
+            //Create new tiff in memory
+            OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("MEM");
+            outputDataset = outputDriver.Create("", x_res, y_res, 1, DataType.GDT_Float64, null);
 
             //Extrac srs from input feature 
             string inputShapeSrs;
@@ -60,11 +52,8 @@ namespace RasterizeCsharp.RasterizeLayer
 
             //Set no data
             Band band = outputDataset.GetRasterBand(1);
-            band.SetNoDataValue(noDataValue);
-
-            //close tiff
-            outputDataset.FlushCache();
-            outputDataset.Dispose();
+            band.SetNoDataValue(GdalUtilConstants.NoDataValue);
+            band.Fill(GdalUtilConstants.NoDataValue,0.0);
 
             //Feature to raster rasterize layer options
 
@@ -73,7 +62,7 @@ namespace RasterizeCsharp.RasterizeLayer
 
             //Values to be burn on raster (10.0)
             double[] burnValues = new double[] { 10.0 };
-            Dataset myDataset = Gdal.Open(outputRasterFile, Access.GA_Update);
+            //Dataset myDataset = Gdal.Open(outputRasterFile, Access.GA_Update);
 
             //additional options
 
@@ -84,7 +73,7 @@ namespace RasterizeCsharp.RasterizeLayer
 
             //Rasterize layer
             //Gdal.RasterizeLayer(myDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, null, null, null); // To burn the given burn values instead of feature attributes
-            Gdal.RasterizeLayer(myDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, rasterizeOptions, new Gdal.GDALProgressFuncDelegate(ProgressFunc), "Raster conversion");
+            Gdal.RasterizeLayer(outputDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, rasterizeOptions, new Gdal.GDALProgressFuncDelegate(ProgressFunc), "Raster conversion");
 
         }
 

@@ -1,38 +1,68 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using OSGeo.GDAL;
-using RasterizeCsharp.AppConstants;
+
+using RasterizeCsharp.AppUtils;
 using RasterizeCsharp.ZonalIO;
+using RasterizeCsharp.RasterizeLayer;
+using RasterizeCsharp.MaskRaster;
 
 namespace RasterizeCsharp.ZonalStatistics
 {
     class ComputeStatistics
     {
-        //Dictionary<int, List<double>> zonalValues = new Dictionary<int, List<double>>();
-        
         private static Dictionary<int, List<double>> _zonalValues;
+        private static string _zoneFile;
 
-        public static void ReadValueAndZoneRasters(string valueRasterName,string zoneRasterName)
+        public static void ComputeZonalStatistics(string valueRasterName, string featureName, string featureFieldName, int cellSize, string zoneOutputFile)
         {
-            double [] valueRaster;
-            double [] zoneRaster;
+            Dataset alignedValueRaster;
+            Dataset zoneRaster;
 
-            RasterInfo valueRasterInfo = GetRasterValue(valueRasterName, out valueRaster);
-            RasterInfo zoneRasterInfo = GetRasterValue(zoneRasterName, out zoneRaster);
+            //Step 1: Convert feature to raster
+            RasterizeGdal.Rasterize(featureName, out zoneRaster, featureFieldName, cellSize);
+
+            //Step 2: Align/mask value raster with step1's output raster
+            MaskRasterBoundary.ClipRaster(featureName, valueRasterName, cellSize, out alignedValueRaster);
             
-            if(valueRasterInfo.RasterHeight!=zoneRasterInfo.RasterHeight || valueRasterInfo.RasterWidth != zoneRasterInfo.RasterWidth)
+            _zoneFile = zoneOutputFile;
+            
+            //Setp 3: Feed both raster into an algorithm
+            ValueAndZoneRasters(ref alignedValueRaster, ref zoneRaster);
+            
+        }
+
+        private static void ValueAndZoneRasters(ref Dataset valueRasterDataset, ref Dataset zoneRasterDataset)
+        {
+            double[] valueRaster;
+            double[] zoneRaster;
+
+            RasterInfo valueRasterInfo = GetRasterAsArray(ref valueRasterDataset, out valueRaster);
+            RasterInfo zoneRasterInfo = GetRasterAsArray(ref zoneRasterDataset, out zoneRaster);
+            
+            /*
+            //Exporting files for viewing output results
+            OSGeo.GDAL.Driver driver = Gdal.GetDriverByName("GTiff");
+
+            driver.CreateCopy("valueRaster.tif", valueRasterDataset, 0, null, null, null);
+            driver.CreateCopy("zoneRaster.tif", zoneRasterDataset, 0, null, null, null);
+            
+            */
+            valueRasterDataset.FlushCache();
+            zoneRasterDataset.FlushCache();
+
+            if (valueRasterInfo.RasterHeight != zoneRasterInfo.RasterHeight || valueRasterInfo.RasterWidth != zoneRasterInfo.RasterWidth)
             {
                 Console.WriteLine("Given input rasters have inconsistant width or height");
                 //System.Environment.Exit(-1);
-            }else
-            {
-                CalculateZonalStatistics(ref valueRaster,ref zoneRaster,valueRasterInfo, out _zonalValues );
             }
-
+            else
+            {
+                PrepareForStatistics(ref valueRaster, ref zoneRaster, valueRasterInfo, out _zonalValues);
+            }
         }
 
-        private static void CalculateZonalStatistics(ref double[] valueRaster, ref double[] zoneRaster, RasterInfo rasterInfo, out Dictionary<int, List<double>> zonalValues)
+        private static void PrepareForStatistics(ref double[] valueRaster, ref double[] zoneRaster, RasterInfo rasterInfo, out Dictionary<int, List<double>> zonalValues)
         {
             zonalValues = new Dictionary<int, List<double>>();
             Console.WriteLine("Calculating zonal statistics ...");
@@ -56,62 +86,29 @@ namespace RasterizeCsharp.ZonalStatistics
                 }
             }
 
-           // Console.WriteLine(zonalValues);
-            StatisticsExport writer = new StatisticsExport("mytest.csv");
-            writer.ExportZonalStatistics(ref zonalValues);
+          StatisticsExport writer = new StatisticsExport(_zoneFile);
+          writer.ExportZonalStatistics(ref zonalValues);
 
         }
 
-        private static RasterInfo GetRasterValue(string rasterName, out double[] rasterValues)
+        private static RasterInfo GetRasterAsArray(ref Dataset rasterDataset, out double[] rasterValues)
         {
-            //Register all drivers
-            Gdal.AllRegister();
-
-            //Read dataset
-            Dataset rasterDataset = Gdal.Open(rasterName, Access.GA_ReadOnly);
-            if (rasterDataset == null)
-            {
-                Console.WriteLine("Unable to read input raster..");
-                System.Environment.Exit(-1);
-            }
-
-            //raster bands
-            int bandCount = rasterDataset.RasterCount;
-            if (bandCount > 1)
-            {
-                Console.WriteLine("Input error, please provide single band raster image only..");
-                System.Environment.Exit(-1);
-            }
-
             //raster size
             int rasterCols = rasterDataset.RasterXSize;
             int rasterRows = rasterDataset.RasterYSize;
-
-            //Extract geotransform
-            double[] geotransform = new double[6];
-            rasterDataset.GetGeoTransform(geotransform);
-
-            //Get raster bounding box
-            double originX = geotransform[0];
-            double originY = geotransform[3];
-            double pixelWidth = geotransform[1];
-            double pixelHeight = geotransform[5];
 
             //Read 1st band from raster
             Band band = rasterDataset.GetRasterBand(1);
             int rastWidth = rasterCols;
             int rastHeight = rasterRows;
 
-            //Need to find out algorithm to read memory block by block instead of reading a big chunk of data
+            //Need to find out an algorithm to read memory block by block instead of reading a big chunk of data
             rasterValues = new double[rastWidth * rastHeight];
             band.ReadRaster(0, 0, rastWidth, rastHeight, rasterValues, rastWidth, rastHeight, 0, 0);
 
-            var info = new RasterInfo {RasterHeight = rasterRows, RasterWidth = rasterCols};
+            var info = new RasterInfo { RasterHeight = rasterRows, RasterWidth = rasterCols };
             return info;
-
         }
-
-        
         
     }
 }
