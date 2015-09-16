@@ -1,10 +1,9 @@
-﻿
-using System;
+﻿using System;
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using OSGeo.OSR;
 
-using RasterizeCsharp.AppConstants;
+using RasterizeCsharp.AppUtils;
 
 namespace RasterizeCsharp.MaskRaster
 {
@@ -36,12 +35,9 @@ namespace RasterizeCsharp.MaskRaster
             
             Dataset oldRasterDataset = Gdal.Open(rasterName, Access.GA_ReadOnly);
            
-            //Create new tiff 
+            //Create new tiff in memory
             OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("MEM");
             
-            //New geotiff name
-            //string outputRasterFile = "mynewraster.tif";
-
             outAlignedRaster = outputDriver.Create("", x_res, y_res, 1, DataType.GDT_Float64, null);
             
             //Geotransform
@@ -51,10 +47,10 @@ namespace RasterizeCsharp.MaskRaster
             
             //Set no data
             Band band = outAlignedRaster.GetRasterBand(1);
-            band.SetNoDataValue(RsacAppConstants.NoDataValue);
+            band.SetNoDataValue(GdalUtilConstants.NoDataValue);
             outAlignedRaster.SetProjection(inputShapeSrs);
 
-            band.Fill(RsacAppConstants.NoDataValue, 0.0);
+            band.Fill(GdalUtilConstants.NoDataValue, 0.0);
 
             string[] reprojectOptions = {"NUM_THREADS = ALL_CPUS"," INIT_DEST = NO_DATA","WRITE_FLUSH = YES" };
 

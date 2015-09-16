@@ -1,8 +1,8 @@
 ﻿using System;
-using System.IO;
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using OSGeo.OSR;
+using RasterizeCsharp.AppUtils;
 
 namespace RasterizeCsharp.RasterizeLayer
 {
@@ -12,9 +12,7 @@ namespace RasterizeCsharp.RasterizeLayer
         {
             // Define pixel_size and NoData value of new raster
             int rasterCellSize = cellSize;
-            const double noDataValue = -9999;
-            //string outputRasterFile = outRaster;
-
+            
             //Register the vector drivers
             Ogr.RegisterAll();
 
@@ -36,15 +34,7 @@ namespace RasterizeCsharp.RasterizeLayer
             //Register the raster drivers
             Gdal.AllRegister();
 
-            //Check if output raster exists & delete (optional)
-            /*
-            if (File.Exists(outputRasterFile))
-            {
-                File.Delete(outputRasterFile);
-            }
-             * */
-
-            //Create new tiff 
+            //Create new tiff in memory
             OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("MEM");
             outputDataset = outputDriver.Create("", x_res, y_res, 1, DataType.GDT_Float64, null);
 
@@ -62,11 +52,8 @@ namespace RasterizeCsharp.RasterizeLayer
 
             //Set no data
             Band band = outputDataset.GetRasterBand(1);
-            band.SetNoDataValue(noDataValue);
-
-            //close tiff
-            //outputDataset.FlushCache();
-            //outputDataset.Dispose();
+            band.SetNoDataValue(GdalUtilConstants.NoDataValue);
+            band.Fill(GdalUtilConstants.NoDataValue,0.0);
 
             //Feature to raster rasterize layer options
 

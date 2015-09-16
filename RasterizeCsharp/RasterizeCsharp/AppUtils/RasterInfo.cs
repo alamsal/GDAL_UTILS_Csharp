@@ -1,4 +1,4 @@
-﻿namespace RasterizeCsharp.AppConstants
+﻿namespace RasterizeCsharp.AppUtils
 {
     public  class RasterInfo
     {
@@ -6,7 +6,7 @@
         public int RasterHeight { get; set; }
     }
 
-    public static class RsacAppConstants
+    public static class GdalUtilConstants
     {
         public const double NoDataValue = -99999.9;
     }
