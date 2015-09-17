@@ -9,7 +9,7 @@ namespace RasterizeCsharp.MaskRaster
 {
     class MaskRasterBoundary
     {
-        public static void ClipRaster(string featureName, string rasterName, int rasterCellSize, out Dataset outAlignedRaster)
+        public static void ClipRaster(string featureName, string rasterName, double rasterCellSize, out Dataset outAlignedRaster)
         {
             //Register vector drivers
             Ogr.RegisterAll();

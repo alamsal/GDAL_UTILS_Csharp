@@ -13,8 +13,9 @@ namespace RasterizeCsharp.ZonalStatistics
     {
         private static Dictionary<int, List<double>> _zonalValues;
         private static string _zoneFile;
+        private static double _cellSize;
 
-        public static void ComputeZonalStatistics(string valueRasterName, string featureName, string featureFieldName, int cellSize, string zoneOutputFile)
+        public static void ComputeZonalStatistics(string valueRasterName, string featureName, string featureFieldName, double cellSize, string zoneOutputFile)
         {
             Dataset alignedValueRaster;
             Dataset zoneRaster;
@@ -26,7 +27,8 @@ namespace RasterizeCsharp.ZonalStatistics
             MaskRasterBoundary.ClipRaster(featureName, valueRasterName, cellSize, out alignedValueRaster);
             
             _zoneFile = zoneOutputFile;
-            
+            _cellSize = cellSize;
+
             //Setp 3: Feed both raster into an algorithm
             ValueAndZoneRasters(ref alignedValueRaster, ref zoneRaster);
             
@@ -85,9 +87,13 @@ namespace RasterizeCsharp.ZonalStatistics
                    }
                 }
             }
-
+          
+          valueRaster = null;
+          zoneRaster = null;
           StatisticsExport writer = new StatisticsExport(_zoneFile);
-          writer.ExportZonalStatistics(ref zonalValues);
+          writer.ExportZonalStatistics(ref zonalValues,_cellSize);
+
+        
 
         }
 
@@ -101,11 +107,16 @@ namespace RasterizeCsharp.ZonalStatistics
             Band band = rasterDataset.GetRasterBand(1);
             int rastWidth = rasterCols;
             int rastHeight = rasterRows;
-
-            //Need to find out an algorithm to read memory block by block instead of reading a big chunk of data
-            rasterValues = new double[rastWidth * rastHeight];
-            band.ReadRaster(0, 0, rastWidth, rastHeight, rasterValues, rastWidth, rastHeight, 0, 0);
-
+            rasterValues = new double[] { };
+            try
+            {
+                //Need to find out an algorithm to read memory block by block instead of reading a big chunk of data
+                rasterValues = new double[rastWidth * rastHeight];
+                band.ReadRaster(0, 0, rastWidth, rastHeight, rasterValues, rastWidth, rastHeight, 0, 0);
+            }catch(Exception ex)
+            {
+                new CustomExceptionHandler("Failed to create 'GetRasterAsArray' ", ex);
+            }
             var info = new RasterInfo { RasterHeight = rasterRows, RasterWidth = rasterCols };
             return info;
         }

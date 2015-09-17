@@ -8,11 +8,8 @@ namespace RasterizeCsharp.RasterizeLayer
 {
     class RasterizeGdal
     {
-        public static void Rasterize(string inputFeature, out Dataset outputDataset, string fieldName, int cellSize)
+        public static void Rasterize(string inputFeature, out Dataset outputDataset, string fieldName, double rasterCellSize)
         {
-            // Define pixel_size and NoData value of new raster
-            int rasterCellSize = cellSize;
-            
             //Register the vector drivers
             Ogr.RegisterAll();
 
