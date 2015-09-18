@@ -50,8 +50,11 @@ namespace RasterizeCsharp.ZonalStatistics
             driver.CreateCopy("zoneRaster.tif", zoneRasterDataset, 0, null, null, null);
             
             */
+            
             valueRasterDataset.FlushCache();
             zoneRasterDataset.FlushCache();
+            valueRasterDataset.Dispose();
+            zoneRasterDataset.Dispose();
 
             if (valueRasterInfo.RasterHeight != zoneRasterInfo.RasterHeight || valueRasterInfo.RasterWidth != zoneRasterInfo.RasterWidth)
             {

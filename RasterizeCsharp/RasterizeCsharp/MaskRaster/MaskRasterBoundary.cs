@@ -60,6 +60,10 @@ namespace RasterizeCsharp.MaskRaster
             band.FlushCache();
             vectorDataSource.FlushCache();
             oldRasterDataset.FlushCache();
+
+            band.Dispose();
+            vectorDataSource.Dispose();
+            oldRasterDataset.Dispose();
             
         }
     }
