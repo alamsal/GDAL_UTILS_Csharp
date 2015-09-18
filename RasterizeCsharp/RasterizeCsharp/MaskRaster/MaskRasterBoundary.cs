@@ -36,9 +36,9 @@ namespace RasterizeCsharp.MaskRaster
             Dataset oldRasterDataset = Gdal.Open(rasterName, Access.GA_ReadOnly);
            
             //Create new tiff in memory
-            OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("MEM");
+            OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("GTiff");
             
-            outAlignedRaster = outputDriver.Create("", x_res, y_res, 1, DataType.GDT_Float64, null);
+            outAlignedRaster = outputDriver.Create("valueRaster.tif", x_res, y_res, 1, DataType.GDT_Float32, null);
             
             //Geotransform
             double[] argin = new double[] { envelope.MinX, rasterCellSize, 0, envelope.MaxY, 0, -rasterCellSize };

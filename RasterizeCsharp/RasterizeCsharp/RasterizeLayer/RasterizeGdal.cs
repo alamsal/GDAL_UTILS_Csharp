@@ -32,8 +32,8 @@ namespace RasterizeCsharp.RasterizeLayer
             Gdal.AllRegister();
 
             //Create new tiff in memory
-            OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("MEM");
-            outputDataset = outputDriver.Create("", x_res, y_res, 1, DataType.GDT_Float64, null);
+            OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("GTiff");
+            outputDataset = outputDriver.Create("zoneRaster.tif", x_res, y_res, 1, DataType.GDT_Float32, null);
 
             //Extrac srs from input feature 
             string inputShapeSrs;
