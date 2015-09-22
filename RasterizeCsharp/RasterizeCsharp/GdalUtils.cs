@@ -8,7 +8,7 @@ namespace RasterizeCsharp
         {
             string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev05.shp";
             string infieldName = "Id";
-            int outRasterCellSize =2;
+            int outRasterCellSize =3;
 
             string inValueRaster = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\Whetstone_20080229eDOQQMos.tif";
             string outZonalCsv = "zonalresults.csv";
