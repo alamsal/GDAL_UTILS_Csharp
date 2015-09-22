@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using RasterizeCsharp.AppUtils;
+using RasterizeCsharp.ZonalStatistics;
 
 namespace RasterizeCsharp.ZonalIO
 {
@@ -73,6 +74,43 @@ namespace RasterizeCsharp.ZonalIO
 
             // Odd number of items. 
             return sortedArray.ElementAt(itemIndex);
+        }
+
+        public void ExportZonalStatistics2(ref Dictionary<int, StatisticsInfo> zonalValues, double cellSize)
+        {
+            Console.WriteLine("Exporting zonal statistics in csv...");
+            using (var w = new StreamWriter(_csvFileName))
+            {
+                string csvHeader = string.Format("{0},{1},{2},{3},{4}", "VALUE", "COUNT", "AREA", "MEAN","SUM");
+                w.WriteLine(csvHeader);
+                w.Flush();
+
+                foreach (KeyValuePair<int,StatisticsInfo> zonevalue in zonalValues )
+                {
+                    try
+                    {   
+                        int value = zonevalue.Key;
+                        double count = zonevalue.Value.Count;
+                        double sum = zonevalue.Value.Sum;
+                        double mean = sum/count;
+
+                        double area = count*cellSize;
+                        var csvLine = string.Format("{0},{1},{2},{3},{4}", value, count, area, mean, sum);
+
+                        w.WriteLine(csvLine);
+                    }
+                    catch (Exception ex)
+                    {
+                        new CustomExceptionHandler("Failed to export zonal statistics 'ExportZonalStatistics'", ex);
+                    }
+                    finally
+                    {
+                        w.Flush();
+                    }
+
+                }
+            }
+
         }
     }
 }

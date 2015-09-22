@@ -4,13 +4,14 @@ using OSGeo.GDAL;
 using RasterizeCsharp.ZonalIO;
 using RasterizeCsharp.RasterizeLayer;
 using RasterizeCsharp.MaskRaster;
+using RasterizeCsharp.ZonalStatistics;
 
 namespace RasterizeCsharp.ZonalStatistics
 {
     class ComputeStatistics
     {
-        private static Dictionary<int, List<double>> _zonalValues;
-        private static Dictionary<int, List<double>> _blockZonalValues = new Dictionary<int, List<double>>();
+        
+        private static Dictionary<int,StatisticsInfo> _zonalValues = new Dictionary<int, StatisticsInfo>();
 
         private static string _zoneFile;
         private static double _cellSize;
@@ -25,16 +26,14 @@ namespace RasterizeCsharp.ZonalStatistics
 
             //Step 2: Align/mask value raster with step1's output raster
             MaskRasterBoundary.ClipRaster(featureName, valueRasterName, cellSize, out alignedValueRaster);
-            
             _zoneFile = zoneOutputFile;
             _cellSize = cellSize;
 
             //Setp 3: Feed both raster into an algorithm
-            
             ReadRasterBlocks(ref alignedValueRaster, ref zoneRaster);
         }
 
-        private static void ProcessRasterBlock(double[] valueRasterValues, double[] zoneRasterValues)
+        private static void ProcessEachRasterBlock(double[] valueRasterValues, double[] zoneRasterValues)
         {
             for(int index=0;index<valueRasterValues.Length;index++)
             {
@@ -42,19 +41,22 @@ namespace RasterizeCsharp.ZonalStatistics
 
                 double valueRasterPixelValue = valueRasterValues[index];
 
-                //Console.WriteLine(rasterPixelValue + " X: " + col + " Y:" + row);
-
-                if (_blockZonalValues.ContainsKey(zoneRasterPixelValue))
+                if (_zonalValues.ContainsKey(zoneRasterPixelValue))
                 {
-                    _blockZonalValues[zoneRasterPixelValue].Add(valueRasterPixelValue);
+                    StatisticsInfo statisticsInfo = _zonalValues[zoneRasterPixelValue];
+
+                    statisticsInfo.Count++;
+                    statisticsInfo.Sum = statisticsInfo.Sum + valueRasterPixelValue;
+
+                    _zonalValues[zoneRasterPixelValue] = statisticsInfo;
+
                 }
                 else
                 {
-                    _blockZonalValues.Add(zoneRasterPixelValue, new List<double>() { valueRasterPixelValue });
+                    _zonalValues[zoneRasterPixelValue] = new StatisticsInfo(){Count = 1, Sum = valueRasterPixelValue}; 
                 }
             }
         }
-
 
         private static void ReadRasterBlocks(ref Dataset valueRaster, ref Dataset zoneRaster)
         {
@@ -94,17 +96,13 @@ namespace RasterizeCsharp.ZonalStatistics
 
                     bandValueRaster.ReadRaster(col, row, colProcess, rowProcess, valueRasterValues, colProcess,rowProcess, 0, 0);
                     bandZoneRaster.ReadRaster(col, row, colProcess, rowProcess, zoneRasterValues, colProcess, rowProcess, 0, 0);
-
-                  
                     
-                    ProcessRasterBlock(valueRasterValues,zoneRasterValues);
+                    ProcessEachRasterBlock(valueRasterValues,zoneRasterValues);
                 }
             }
 
             StatisticsExport writer = new StatisticsExport(_zoneFile);
-            writer.ExportZonalStatistics(ref _blockZonalValues, _cellSize);
-
-
+            writer.ExportZonalStatistics2(ref _zonalValues, _cellSize);
         }
 
 

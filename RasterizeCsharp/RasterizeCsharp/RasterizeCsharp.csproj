@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppUtils\CustomException.cs" />
+    <Compile Include="ZonalStatistics\StatisticsInfo.cs" />
     <Compile Include="MaskRaster\MaskRasterBoundary.cs" />
     <Compile Include="ZonalIO\StatisticsExport.cs" />
     <Compile Include="RasterizeLayer\RasterizeEsri.cs" />
