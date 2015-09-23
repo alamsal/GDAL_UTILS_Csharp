@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using OSGeo.GDAL;
+using RasterizeCsharp.AppUtils;
 using RasterizeCsharp.ZonalIO;
 using RasterizeCsharp.RasterizeLayer;
 using RasterizeCsharp.MaskRaster;
@@ -37,24 +38,30 @@ namespace RasterizeCsharp.ZonalStatistics
         {
             for(int index=0;index<valueRasterValues.Length;index++)
             {
-                int zoneRasterPixelValue = Convert.ToInt32(zoneRasterValues[index]);
-
-                double valueRasterPixelValue = valueRasterValues[index];
-
-                if (_zonalValues.ContainsKey(zoneRasterPixelValue))
+                //Skip no data values as in ESRI
+                if((Math.Round(zoneRasterValues[index],3) != GdalUtilConstants.NoDataValue) && (Math.Round(valueRasterValues[index],3) != GdalUtilConstants.NoDataValue))
                 {
-                    StatisticsInfo statisticsInfo = _zonalValues[zoneRasterPixelValue];
+                    int zoneRasterPixelValue = Convert.ToInt32(zoneRasterValues[index]);
 
-                    statisticsInfo.Count++;
-                    statisticsInfo.Sum = statisticsInfo.Sum + valueRasterPixelValue;
+                    double valueRasterPixelValue = valueRasterValues[index];
 
-                    _zonalValues[zoneRasterPixelValue] = statisticsInfo;
+                    if (_zonalValues.ContainsKey(zoneRasterPixelValue))
+                    {
+                        StatisticsInfo statisticsInfo = _zonalValues[zoneRasterPixelValue];
 
+                        statisticsInfo.Count++;
+                        statisticsInfo.Sum = statisticsInfo.Sum + valueRasterPixelValue;
+
+                        _zonalValues[zoneRasterPixelValue] = statisticsInfo;
+
+                    }
+                    else
+                    {
+                        _zonalValues[zoneRasterPixelValue] = new StatisticsInfo() { Count = 1, Sum = valueRasterPixelValue };
+                    }
+                    
                 }
-                else
-                {
-                    _zonalValues[zoneRasterPixelValue] = new StatisticsInfo(){Count = 1, Sum = valueRasterPixelValue}; 
-                }
+
             }
         }
 
