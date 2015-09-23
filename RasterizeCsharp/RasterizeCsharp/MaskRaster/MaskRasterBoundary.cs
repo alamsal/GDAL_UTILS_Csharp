@@ -38,7 +38,7 @@ namespace RasterizeCsharp.MaskRaster
             //Create new tiff in memory
             OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("GTiff");
             
-            outAlignedRaster = outputDriver.Create("valueRaster.tif", x_res, y_res, 1, DataType.GDT_Float32, null);
+            outAlignedRaster = outputDriver.Create("tempValueRaster.tif", x_res, y_res, 1, DataType.GDT_Float32, null);
             
             //Geotransform
             double[] argin = new double[] { envelope.MinX, rasterCellSize, 0, envelope.MaxY, 0, -rasterCellSize };
@@ -47,12 +47,12 @@ namespace RasterizeCsharp.MaskRaster
             
             //Set no data
             Band band = outAlignedRaster.GetRasterBand(1);
-            band.SetNoDataValue(GdalUtilConstants.NoDataValue);
+            //band.SetNoDataValue(GdalUtilConstants.NoDataValue);
             outAlignedRaster.SetProjection(inputShapeSrs);
 
             band.Fill(GdalUtilConstants.NoDataValue, 0.0);
 
-            string[] reprojectOptions = {"NUM_THREADS = ALL_CPUS"," INIT_DEST = NO_DATA","WRITE_FLUSH = YES" };
+            string[] reprojectOptions = {"NUM_THREADS = ALL_CPUS","WRITE_FLUSH = YES" };
 
             Gdal.ReprojectImage(oldRasterDataset, outAlignedRaster, null, inputShapeSrs, ResampleAlg.GRA_NearestNeighbour,0.0, 0.0, null, null, reprojectOptions);
             

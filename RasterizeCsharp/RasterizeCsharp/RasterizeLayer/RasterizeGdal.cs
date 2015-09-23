@@ -33,7 +33,7 @@ namespace RasterizeCsharp.RasterizeLayer
 
             //Create new tiff in memory
             OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("GTiff");
-            outputDataset = outputDriver.Create("zoneRaster.tif", x_res, y_res, 1, DataType.GDT_Float32, null);
+            outputDataset = outputDriver.Create("tempZoneRaster.tif", x_res, y_res, 1, DataType.GDT_Float32, null);
 
             //Extrac srs from input feature 
             string inputShapeSrs;
@@ -49,7 +49,7 @@ namespace RasterizeCsharp.RasterizeLayer
 
             //Set no data
             Band band = outputDataset.GetRasterBand(1);
-            band.SetNoDataValue(GdalUtilConstants.NoDataValue);
+            //band.SetNoDataValue(GdalUtilConstants.NoDataValue);
             band.Fill(GdalUtilConstants.NoDataValue,0.0);
 
             //Feature to raster rasterize layer options
