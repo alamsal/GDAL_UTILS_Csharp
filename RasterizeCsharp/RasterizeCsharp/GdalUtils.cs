@@ -1,4 +1,5 @@
-﻿using RasterizeCsharp.ZonalStatistics;
+﻿using System;
+using RasterizeCsharp.ZonalStatistics;
 
 namespace RasterizeCsharp
 {
@@ -8,12 +9,27 @@ namespace RasterizeCsharp
         {
             string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev05.shp";
             string infieldName = "Id";
-            int outRasterCellSize =1;
+            int outRasterCellSize =3;
 
             string inValueRaster = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\Whetstone_20080229eDOQQMos.tif";
             string outZonalCsv = "new_zonalresults.csv";
+            string outZonalTable = @"D:\Ashis_Work\GDAL Utilities\sample-data\esri_zonalTable.dbf";
 
+            DateTime gdalStart = DateTime.Now;
             ComputeStatistics.ComputeZonalStatistics(inValueRaster, inputShapeFile, infieldName, outRasterCellSize, outZonalCsv);
+            DateTime gdalEnd = DateTime.Now;
+
+            TimeSpan gdalTimeSpan = gdalEnd - gdalStart;
+            Console.WriteLine("Total time GDAL: {0}",gdalTimeSpan);
+
+            DateTime esriStart = DateTime.Now;
+            ZonalStatisticsEsri.ComputeZonalStatisticsFromEsri(inputShapeFile,infieldName,inValueRaster,outZonalTable);
+            DateTime esriEnd = DateTime.Now;
+
+            TimeSpan esriTimeSpan = esriEnd - esriStart;
+            Console.WriteLine("Total time ESRI: {0}", esriTimeSpan);
+
+            Console.ReadLine();
 
         }
 

@@ -24,9 +24,9 @@ namespace RasterizeCsharp.RasterizeLayer
             int x_res = Convert.ToInt32((envelope.MaxX - envelope.MinX) / rasterCellSize);
             int y_res = Convert.ToInt32((envelope.MaxY - envelope.MinY) / rasterCellSize);
 
-            Console.WriteLine("Extent: " + envelope.MaxX + " " + envelope.MinX + " " + envelope.MaxY + " " + envelope.MinY);
-            Console.WriteLine("X resolution: " + x_res);
-            Console.WriteLine("X resolution: " + y_res);
+            //Console.WriteLine("Extent: " + envelope.MaxX + " " + envelope.MinX + " " + envelope.MaxY + " " + envelope.MinY);
+            //Console.WriteLine("X resolution: " + x_res);
+            //Console.WriteLine("X resolution: " + y_res);
 
             //Register the raster drivers
             Gdal.AllRegister();
@@ -70,7 +70,9 @@ namespace RasterizeCsharp.RasterizeLayer
 
             //Rasterize layer
             //Gdal.RasterizeLayer(myDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, null, null, null); // To burn the given burn values instead of feature attributes
-            Gdal.RasterizeLayer(outputDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, rasterizeOptions, new Gdal.GDALProgressFuncDelegate(ProgressFunc), "Raster conversion");
+            //Gdal.RasterizeLayer(outputDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, rasterizeOptions, new Gdal.GDALProgressFuncDelegate(ProgressFunc), "Raster conversion");
+
+            Gdal.RasterizeLayer(outputDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, rasterizeOptions, null,null);
 
         }
 

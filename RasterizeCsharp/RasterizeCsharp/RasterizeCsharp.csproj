@@ -37,13 +37,11 @@
   <ItemGroup>
     <Reference Include="ESRI.ArcGIS.ConversionTools, Version=10.0.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=x86" />
     <Reference Include="ESRI.ArcGIS.Geoprocessor, Version=10.0.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=x86" />
+    <Reference Include="ESRI.ArcGIS.SpatialAnalystTools, Version=10.0.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=x86" />
     <Reference Include="ESRI.ArcGIS.System, Version=10.0.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=x86">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="ESRI.ArcGIS.Version, Version=10.0.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=x86" />
-    <Reference Include="gdalconst_csharp">
-      <HintPath>C:\GDAL\gdal\csharp\gdalconst_csharp.dll</HintPath>
-    </Reference>
     <Reference Include="gdal_csharp">
       <HintPath>C:\GDAL\gdal\csharp\gdal_csharp.dll</HintPath>
     </Reference>
@@ -67,6 +65,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ZonalStatistics\ComputeStatistics.cs" />
     <Compile Include="AppUtils\RasterInfo.cs" />
+    <Compile Include="ZonalStatistics\ZonalStatisticsEsri.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
