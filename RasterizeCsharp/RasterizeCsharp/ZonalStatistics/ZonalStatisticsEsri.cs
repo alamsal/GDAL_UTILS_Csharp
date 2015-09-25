@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using ESRI.ArcGIS.DataSourcesRaster;
 using ESRI.ArcGIS.Geodatabase;
 using ESRI.ArcGIS.Geoprocessor;
 using ESRI.ArcGIS.SpatialAnalystTools;
 using ESRI.ArcGIS.esriSystem;
 
+using RasterizeCsharp.RasterizeLayer;
 
 namespace RasterizeCsharp.ZonalStatistics
 {
@@ -92,77 +94,106 @@ namespace RasterizeCsharp.ZonalStatistics
 
         }
 
-        public static void OpenFileRasterDataset(string folderName, string datasetName,string featureName,string fieldName, string outTableName)
+        public static void OpenFileRasterDataset(string inFolderName, string inRasterDatasetName, string inFeatureName, string inFieldName, int outCellSize)
         {
             EnableEsriLiscences();
+            
+            //Get feature raster from feature shp
+            string outTempRasterName = "tempRasterFromESRI.tif";
+            string outZoneRater = inFolderName + "\\" + outTempRasterName;
+            //RasterizeEsri.Rasterize(inFeatureName, outZoneRater, inFieldName, outCellSize);
+            
+            // Value containers
+            Dictionary<int,List<double>> rasterBandValues = new Dictionary<int, List<double>>();
+            Dictionary<int,uint> rasterCellCounts = new Dictionary<int, uint>();
+            
 
             //Open raster file workspace
             IWorkspaceFactory workspaceFactory = new RasterWorkspaceFactoryClass();
-            IRasterWorkspace rasterWorkspace = (IRasterWorkspace) workspaceFactory.OpenFromFile(folderName, 0);
+            IRasterWorkspace rasterWorkspace = (IRasterWorkspace) workspaceFactory.OpenFromFile(inFolderName, 0);
+            
+            
+            //Open zone raster dataset
+            IRasterDataset zoneRasterDataset = rasterWorkspace.OpenRasterDataset(outTempRasterName);
 
-            //Open file raster dataset 
-            IRasterDataset rasterDataset = rasterWorkspace.OpenRasterDataset(datasetName);
 
-            IRasterBandCollection rasBandCol = rasterDataset as IRasterBandCollection;
+            //Open value raster dataset 
+            IRasterDataset valueRasterDataset = rasterWorkspace.OpenRasterDataset(inRasterDatasetName);
+
+            //Extract bands from the raster
+            IRasterBandCollection zoneRasterBandCol = zoneRasterDataset as IRasterBandCollection;
+            IRasterBandCollection valueRasterBandCol = valueRasterDataset as IRasterBandCollection;
             
 
             //create raster cursor to read block by block
+            IRaster2 zoneRaster2 = zoneRasterDataset.CreateDefaultRaster() as IRaster2;
+            IRasterCursor zoneRasterCursor = zoneRaster2.CreateCursorEx(null);
 
-            IRaster2 raster2 = rasterDataset.CreateDefaultRaster() as IRaster2;
+            IRaster2 valueRaster2 = valueRasterDataset.CreateDefaultRaster() as IRaster2;
+            IRasterCursor valueRasterCursor = valueRaster2.CreateCursorEx(null);
 
-            IRasterCursor rasterCursor = raster2.CreateCursorEx(null);
+            
+            System.Array valueRasterPixels;
+            System.Array zoneRasterPixels;
+            object pixelValueFromValue,pixelValueFromZone;
 
-            IRasterEdit rasterEdit = raster2 as IRasterEdit;
-            System.Array pixels;
-            object value;
 
-
-            IPixelBlock3 pixelBlock3 = null;
+            IPixelBlock3 valueRasterPixelBlock3 = null;
+            IPixelBlock3 zoneRasterPixelBlock3 = null;
             int blockWidth = 0;
             int blockHeight = 0;
             
             do
             {
-                pixelBlock3 = rasterCursor.PixelBlock as IPixelBlock3;
-                blockWidth = pixelBlock3.Width;
-                blockHeight = pixelBlock3.Height;
+                valueRasterPixelBlock3 = valueRasterCursor.PixelBlock as IPixelBlock3;
+                blockWidth = valueRasterPixelBlock3.Width;
+                blockHeight = valueRasterPixelBlock3.Height;
+
+                zoneRasterPixelBlock3 = zoneRasterCursor.PixelBlock as IPixelBlock3;
 
                 Console.WriteLine(blockHeight);
                 Console.WriteLine(blockWidth);
 
                 try
                 {
-                    for (int k = 0; k < rasBandCol.Count; k++)
+                     zoneRasterPixels = (System.Array)zoneRasterPixelBlock3.get_PixelData(0);
+
+                    for (int b = 0; b < valueRasterBandCol.Count; b++)
                     {
-                        Console.WriteLine(k);
+                        Console.WriteLine(b);
                         //Get pixel array
-                        pixels = (System.Array)pixelBlock3.get_PixelData(k);
+                        valueRasterPixels = (System.Array)valueRasterPixelBlock3.get_PixelData(b);
 
                         for (int i = 0; i < blockWidth; i++)
                         {
                             for (int j = 0; j < blockHeight; j++)
                             {
                                 //Get pixel value
-                                value = pixels.GetValue(i, j);
+                                pixelValueFromValue = valueRasterPixels.GetValue(i, j);
 
-                                //Console.WriteLine(value);
+                                pixelValueFromZone = zoneRasterPixels.GetValue(i, j);
+
+
+                                Console.WriteLine( pixelValueFromZone +" <--> "+ pixelValueFromValue);
                             }
                         }
 
-                        pixelBlock3.set_PixelData(k, pixels);
+                        valueRasterPixelBlock3.set_PixelData(b, valueRasterPixels);
+                        
                     }
+
+                    zoneRasterPixelBlock3.set_PixelData(0,zoneRasterPixels);
+
+
                 
                 }
                 catch(Exception ex)
                {
                    Console.WriteLine(ex.Message);
                }
-                
-
-               
 
 
-            } while (rasterCursor.Next() == true);
+            } while (valueRasterCursor.Next() == true);
 
             Console.WriteLine("done");
 
