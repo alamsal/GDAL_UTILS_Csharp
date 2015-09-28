@@ -101,6 +101,7 @@ namespace RasterizeCsharp.ZonalStatistics
             //Get feature raster from feature shp
             string outTempRasterName = "tempRasterFromESRI.tif";
             string outZoneRater = inFolderName + "\\" + outTempRasterName;
+            int rasterBlockSize = 1024;
             RasterizeEsri.Rasterize(inFeatureName, outZoneRater, inFieldName, outCellSize);
             
             // Value containers
@@ -115,27 +116,23 @@ namespace RasterizeCsharp.ZonalStatistics
             
             //Open zone raster dataset
             IRasterDataset zoneRasterDataset = rasterWorkspace.OpenRasterDataset(outTempRasterName);
-
+            IRasterDataset2 zoneRasterDataset2 = zoneRasterDataset as IRasterDataset2;
+            IRaster zoneRs = zoneRasterDataset2.CreateFullRaster();
 
             //Open value raster dataset 
             IRasterDataset valueRasterDataset = rasterWorkspace.OpenRasterDataset(inRasterDatasetName);
+            IRasterDataset2 valueRasterDataset2 = valueRasterDataset as IRasterDataset2;
+            IRaster valueRs = valueRasterDataset2.CreateFullRaster();
 
             //Extract bands from the raster
             IRasterBandCollection zoneRasterBandCol = zoneRasterDataset as IRasterBandCollection;
-            IRasterBandCollection valueRasterBandCol = valueRasterDataset as IRasterBandCollection;
+            IRasterBandCollection valueRasterPlanes = valueRasterDataset as IRasterBandCollection;
             
 
             //create raster cursor to read block by block
-            IPnt pnt = new PntClass();
-            pnt.SetCoords(1024,2014);
+            IPnt blockSize = new PntClass();
+            blockSize.SetCoords(rasterBlockSize,rasterBlockSize);
 
-            IRaster2 zoneRaster2 = zoneRasterDataset.CreateDefaultRaster() as IRaster2;
-            IRasterCursor zoneRasterCursor = zoneRaster2.CreateCursorEx(pnt);
-
-            IRaster2 valueRaster2 = valueRasterDataset.CreateDefaultRaster() as IRaster2;
-            IRasterCursor valueRasterCursor = valueRaster2.CreateCursorEx(pnt);
-
-            
             System.Array valueRasterPixels;
             System.Array zoneRasterPixels;
             object pixelValueFromValue; 
@@ -144,26 +141,22 @@ namespace RasterizeCsharp.ZonalStatistics
 
             IPixelBlock3 valueRasterPixelBlock3 = null;
             IPixelBlock3 zoneRasterPixelBlock3 = null;
-            int blockWidth = 0;
-            int blockHeight = 0;
-            int zoneRasterBandId = 0;
+           
+           
 
 
             //Raster value holder
-            if (valueRasterBandCol != null)
+            if (valueRasterPlanes != null)
             {
-                Dictionary<int,StatisticsInfo> [] rasInfoDict = new Dictionary<int, StatisticsInfo>[valueRasterBandCol.Count];
+                Dictionary<int, StatisticsInfo>[] rasInfoDict = new Dictionary<int, StatisticsInfo>[valueRasterPlanes.Count];
                 
             
-                do
-                {
+                    valueRasterPixelBlock3 = valueRs.CreatePixelBlock(blockSize) as IPixelBlock3;
+                    int blockWidth = valueRasterPixelBlock3.Width;
+                    int blockHeight = valueRasterPixelBlock3.Height;
+                    int zoneRasterBandId = 0;
 
-
-                    valueRasterPixelBlock3 = valueRasterCursor.PixelBlock as IPixelBlock3;
-                    blockWidth = valueRasterPixelBlock3.Width;
-                    blockHeight = valueRasterPixelBlock3.Height;
-
-                    zoneRasterPixelBlock3 = zoneRasterCursor.PixelBlock as IPixelBlock3;
+                    zoneRasterPixelBlock3 = zoneRs.CreatePixelBlock(blockSize) as IPixelBlock3;
 
                     Console.WriteLine(zoneRasterPixelBlock3.Width);
                     Console.WriteLine(blockWidth);
@@ -172,7 +165,7 @@ namespace RasterizeCsharp.ZonalStatistics
                     {
 
                         zoneRasterPixels = (System.Array)zoneRasterPixelBlock3.get_PixelData(zoneRasterBandId);
-                        for (int b = 0; b < valueRasterBandCol.Count; b++)
+                        for (int b = 0; b < valueRasterPlanes.Count; b++)
                         {
                             Console.WriteLine(b);
                             //Get pixel array
@@ -221,9 +214,6 @@ namespace RasterizeCsharp.ZonalStatistics
                     {
                         Console.WriteLine(ex.Message);
                     }
-
-
-                } while (valueRasterCursor.Next() == true);
 
                 Console.WriteLine(rasInfoDict);
             }
