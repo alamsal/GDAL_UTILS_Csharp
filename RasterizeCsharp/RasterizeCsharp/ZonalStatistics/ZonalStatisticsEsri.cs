@@ -141,10 +141,11 @@ namespace RasterizeCsharp.ZonalStatistics
                 do
                 {
                     IPixelBlock3 valueRasterPixelBlock3 = valueRasterCursor.PixelBlock as IPixelBlock3;
-                    
                     IPixelBlock3 zoneRasterPixelBlock3 = zoneRasterCursor.PixelBlock as IPixelBlock3;
-                    int blockWidth = zoneRasterPixelBlock3.Width;
-                    int blockHeight = zoneRasterPixelBlock3.Height;
+                    
+                    //No Idea how esri cursor fills the raster gap if zone is greater than value, so quick and fix using smallest extent
+                    int blockWidth = valueRasterPixelBlock3.Width < zoneRasterPixelBlock3.Width ? valueRasterPixelBlock3.Width : zoneRasterPixelBlock3.Width;
+                    int blockHeight = valueRasterPixelBlock3.Height < zoneRasterPixelBlock3.Height ? valueRasterPixelBlock3.Height : zoneRasterPixelBlock3.Height;
 
                     //Console.WriteLine(zoneRasterPixelBlock3.Width);
                     //Console.WriteLine(blockWidth);
