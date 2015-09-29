@@ -103,74 +103,77 @@ namespace RasterizeCsharp.ZonalStatistics
             string outZoneRater = inFolderName + "\\" + outTempRasterName;
             int rasterBlockSize = 1024;
             RasterizeEsri.Rasterize(inFeatureName, outZoneRater, inFieldName, outCellSize);
-            
+
             // Value containers
-            Dictionary<int,List<double>> rasterBandValues = new Dictionary<int, List<double>>();
-            Dictionary<int,uint> rasterCellCounts = new Dictionary<int, uint>();
-            
+            Dictionary<int, List<double>> rasterBandValues = new Dictionary<int, List<double>>();
+            Dictionary<int, uint> rasterCellCounts = new Dictionary<int, uint>();
+
 
             //Open raster file workspace
             IWorkspaceFactory workspaceFactory = new RasterWorkspaceFactoryClass();
-            IRasterWorkspace rasterWorkspace = (IRasterWorkspace) workspaceFactory.OpenFromFile(inFolderName, 0);
-            
-            
+            IRasterWorkspace rasterWorkspace = (IRasterWorkspace)workspaceFactory.OpenFromFile(inFolderName, 0);
+
+
             //Open zone raster dataset
             IRasterDataset zoneRasterDataset = rasterWorkspace.OpenRasterDataset(outTempRasterName);
             IRasterDataset2 zoneRasterDataset2 = zoneRasterDataset as IRasterDataset2;
-            IRaster zoneRs = zoneRasterDataset2.CreateFullRaster();
+            IRaster2 zoneRs2 = zoneRasterDataset2.CreateFullRaster() as IRaster2;
+
 
             //Open value raster dataset 
             IRasterDataset valueRasterDataset = rasterWorkspace.OpenRasterDataset(inRasterDatasetName);
             IRasterDataset2 valueRasterDataset2 = valueRasterDataset as IRasterDataset2;
-            IRaster valueRs = valueRasterDataset2.CreateFullRaster();
+            IRaster2 valueRs2 = valueRasterDataset2.CreateFullRaster() as IRaster2;
 
             //Extract bands from the raster
             IRasterBandCollection zoneRasterBandCol = zoneRasterDataset as IRasterBandCollection;
             IRasterBandCollection valueRasterPlanes = valueRasterDataset as IRasterBandCollection;
-            
+
 
             //create raster cursor to read block by block
             IPnt blockSize = new PntClass();
-            blockSize.SetCoords(rasterBlockSize,rasterBlockSize);
+            blockSize.SetCoords(rasterBlockSize, rasterBlockSize);
+
+            IRasterCursor valueRasterCursor = valueRs2.CreateCursorEx(blockSize);
+            IRasterCursor zoneRasterCursor = zoneRs2.CreateCursorEx(blockSize);
 
             System.Array valueRasterPixels;
             System.Array zoneRasterPixels;
-            object pixelValueFromValue; 
+            object pixelValueFromValue;
             object pixelValueFromZone;
 
 
             IPixelBlock3 valueRasterPixelBlock3 = null;
             IPixelBlock3 zoneRasterPixelBlock3 = null;
-           
-           
+
+
 
 
             //Raster value holder
             if (valueRasterPlanes != null)
             {
                 Dictionary<int, StatisticsInfo>[] rasInfoDict = new Dictionary<int, StatisticsInfo>[valueRasterPlanes.Count];
-                
-            
-                    valueRasterPixelBlock3 = valueRs.CreatePixelBlock(blockSize) as IPixelBlock3;
+
+                do
+                {
+                    valueRasterPixelBlock3 = valueRasterCursor.PixelBlock as IPixelBlock3;
                     int blockWidth = valueRasterPixelBlock3.Width;
                     int blockHeight = valueRasterPixelBlock3.Height;
                     int zoneRasterBandId = 0;
 
-                    zoneRasterPixelBlock3 = zoneRs.CreatePixelBlock(blockSize) as IPixelBlock3;
+                    zoneRasterPixelBlock3 = zoneRasterCursor.PixelBlock as IPixelBlock3;
 
                     Console.WriteLine(zoneRasterPixelBlock3.Width);
                     Console.WriteLine(blockWidth);
 
                     try
                     {
-
                         zoneRasterPixels = (System.Array)zoneRasterPixelBlock3.get_PixelData(zoneRasterBandId);
                         for (int b = 0; b < valueRasterPlanes.Count; b++)
                         {
                             Console.WriteLine(b);
                             //Get pixel array
                             valueRasterPixels = (System.Array)valueRasterPixelBlock3.get_PixelData(b);
-                            
 
                             rasInfoDict[b] = new Dictionary<int, StatisticsInfo>();
 
@@ -181,39 +184,45 @@ namespace RasterizeCsharp.ZonalStatistics
                                     //Get pixel value
                                     pixelValueFromValue = valueRasterPixels.GetValue(i, j);
                                     pixelValueFromZone = zoneRasterPixels.GetValue(i, j);
-                                
+
                                     //process each pixel value
-                                    
+
+                                    /*
                                     if (rasInfoDict[b].ContainsKey(Convert.ToInt32(pixelValueFromZone)))
                                     {
-                                        StatisticsInfo rastStatistics = rasInfoDict[b][ Convert.ToInt32(pixelValueFromZone)];
+                                        StatisticsInfo rastStatistics = rasInfoDict[b][Convert.ToInt32(pixelValueFromZone)];
                                         rastStatistics.Count++;
                                         rastStatistics.Sum = rastStatistics.Sum + Convert.ToDouble(pixelValueFromValue);
 
-                                        rasInfoDict[b][ Convert.ToInt32(pixelValueFromZone)] = rastStatistics;
+                                        rasInfoDict[b][Convert.ToInt32(pixelValueFromZone)] = rastStatistics;
                                     }
-                                 
+
                                     else
                                     {
-                                        rasInfoDict[b][Convert.ToInt32(pixelValueFromZone)] = new StatisticsInfo() {Count = 1,Sum = Convert.ToDouble(pixelValueFromValue)};
+                                        rasInfoDict[b][Convert.ToInt32(pixelValueFromZone)] = new StatisticsInfo() { Count = 1, Sum = Convert.ToDouble(pixelValueFromValue) };
                                     }
-                                        
+                                    */
 
-                                    Console.WriteLine( pixelValueFromZone +" <--> "+ pixelValueFromValue);
+                                     Console.WriteLine( pixelValueFromZone +" <--> "+ pixelValueFromValue);
+                                    //Console.WriteLine(pixelValueFromZone);
                                 }
                             }
-                            valueRasterPixelBlock3.set_PixelData(b, valueRasterPixels);
-                            zoneRasterPixelBlock3.set_PixelData(zoneRasterBandId, zoneRasterPixels);
+                            //valueRasterPixelBlock3.set_PixelData(b, valueRasterPixels);
+                            //zoneRasterPixelBlock3.set_PixelData(zoneRasterBandId, zoneRasterPixels);
                         }
-                       
 
 
-                
+
+
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Console.WriteLine(ex.Message);
                     }
+
+                } while (zoneRasterCursor.Next() == true);
+
+
 
                 Console.WriteLine(rasInfoDict);
             }
