@@ -79,8 +79,7 @@ namespace RasterizeCsharp.ZonalStatistics
                 Band bandZoneRaster = zoneRaster.GetRasterBand(1);
 
                 _rasInfoDict[rasBand] = new Dictionary<int, StatisticsInfo>();
-                Console.WriteLine("rasband: {0}",rasBand);
-
+               
                 for (int row = 0; row < rasterRows; row += blockSize)
                 {
                     int rowProcess;
@@ -110,7 +109,7 @@ namespace RasterizeCsharp.ZonalStatistics
 
                         bandValueRaster.ReadRaster(col, row, colProcess, rowProcess, valueRasterValues, colProcess, rowProcess, 0, 0);
                         bandZoneRaster.ReadRaster(col, row, colProcess, rowProcess, zoneRasterValues, colProcess, rowProcess, 0, 0);
-                        Console.WriteLine(row+"<-->"+col);
+                        
                         ProcessEachRasterBlock(valueRasterValues, zoneRasterValues, rasBand, ref _rasInfoDict);
                     }
                 }
@@ -118,10 +117,10 @@ namespace RasterizeCsharp.ZonalStatistics
             }
 
 
-            //StatisticsExport writer = new StatisticsExport(_zoneFile);
-            //writer.ExportZonalStatistics2(ref _zonalValues, _cellSize);
+            StatisticsExport writer = new StatisticsExport(_zoneFile);
+            writer.ExportZonalStatistics2(ref _rasInfoDict, _cellSize);
 
-            Console.WriteLine("zonal completed!");
+           
         }
 
 

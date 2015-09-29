@@ -7,6 +7,7 @@ using ESRI.ArcGIS.SpatialAnalystTools;
 using ESRI.ArcGIS.esriSystem;
 
 using RasterizeCsharp.RasterizeLayer;
+using RasterizeCsharp.ZonalIO;
 
 namespace RasterizeCsharp.ZonalStatistics
 {
@@ -94,7 +95,7 @@ namespace RasterizeCsharp.ZonalStatistics
 
         }
 
-        public static void OpenFileRasterDataset(string inFolderName, string inRasterDatasetName, string inFeatureName, string inFieldName, int outCellSize)
+        public static void OpenFileRasterDataset(string inFolderName, string inRasterDatasetName, string inFeatureName, string inFieldName, int outCellSize, string outSummaryFile)
         {
             EnableEsriLiscences();
 
@@ -191,12 +192,18 @@ namespace RasterizeCsharp.ZonalStatistics
 
                 } while (zoneRasterCursor.Next() == true);
 
-                Console.WriteLine(rasInfoDict);
+                //Export results
+                StatisticsExport writer = new StatisticsExport(outSummaryFile);
+                writer.ExportZonalStatistics2(ref rasInfoDict, outCellSize);
+
             }
             else
             {
                 Console.WriteLine("No band available in the Value Raster");
             }
+
+
+            
         }
 
 
