@@ -132,17 +132,22 @@ namespace RasterizeCsharp.ZonalStatistics
             IRasterCursor valueRasterCursor = valueRs2.CreateCursorEx(blockSize);
             IRasterCursor zoneRasterCursor = zoneRs2.CreateCursorEx(blockSize);
 
-           
+
             if (valueRasterPlanes != null)
             {
                 Dictionary<int, StatisticsInfo>[] rasInfoDict = new Dictionary<int, StatisticsInfo>[valueRasterPlanes.Count];
                 int zoneRasterBandId = 0;
 
+                for (int b = 0; b < valueRasterPlanes.Count; b++)
+                {
+                    rasInfoDict[b] = new Dictionary<int, StatisticsInfo>();
+                }
+
                 do
                 {
                     IPixelBlock3 valueRasterPixelBlock3 = valueRasterCursor.PixelBlock as IPixelBlock3;
                     IPixelBlock3 zoneRasterPixelBlock3 = zoneRasterCursor.PixelBlock as IPixelBlock3;
-                    
+
                     //No Idea how esri cursor fills the raster gap if zone is greater than value, so quick and fix using smallest extent
                     int blockWidth = valueRasterPixelBlock3.Width < zoneRasterPixelBlock3.Width ? valueRasterPixelBlock3.Width : zoneRasterPixelBlock3.Width;
                     int blockHeight = valueRasterPixelBlock3.Height < zoneRasterPixelBlock3.Height ? valueRasterPixelBlock3.Height : zoneRasterPixelBlock3.Height;
@@ -159,8 +164,6 @@ namespace RasterizeCsharp.ZonalStatistics
                             //Get pixel array
                             System.Array valueRasterPixels = (System.Array)valueRasterPixelBlock3.get_PixelData(b);
 
-                            rasInfoDict[b] = new Dictionary<int, StatisticsInfo>();
-
                             for (int i = 0; i < blockWidth; i++)
                             {
                                 for (int j = 0; j < blockHeight; j++)
@@ -168,7 +171,7 @@ namespace RasterizeCsharp.ZonalStatistics
                                     //Get pixel value
                                     object pixelValueFromValue = valueRasterPixels.GetValue(i, j);
                                     object pixelValueFromZone = zoneRasterPixels.GetValue(i, j);
-                                    
+
                                     //process each pixel value
                                     if (rasInfoDict[b].ContainsKey(Convert.ToInt32(pixelValueFromZone)))
                                     {
@@ -184,7 +187,7 @@ namespace RasterizeCsharp.ZonalStatistics
                                     }
                                 }
                             }
-                         }
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -204,7 +207,7 @@ namespace RasterizeCsharp.ZonalStatistics
             }
 
 
-            
+
         }
 
 

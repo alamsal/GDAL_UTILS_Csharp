@@ -23,7 +23,7 @@ namespace RasterizeCsharp
             //string inValueRaster = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\Whetstone_20080229eDOQQMos.tif";
             
             DateTime gdalStart = DateTime.Now;
-            //ComputeStatistics.ComputeZonalStatistics(inValueRaster, inputShapeFile, infieldName, outRasterCellSize, outZonalCsvGDAL);
+            ComputeStatistics.ComputeZonalStatistics(inValueRaster, inputShapeFile, infieldName, outRasterCellSize, outZonalCsvGDAL);
 
             DateTime gdalEnd = DateTime.Now;
 
