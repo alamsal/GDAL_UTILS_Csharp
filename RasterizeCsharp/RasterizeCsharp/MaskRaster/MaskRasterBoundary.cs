@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using OSGeo.OSR;
@@ -38,10 +39,14 @@ namespace RasterizeCsharp.MaskRaster
             //No of bands in older dataset
             int rasterBands = oldRasterDataset.RasterCount;
            
-            //Create new tiff in memory
+            //Create new tiff in disk
+            string tempRaster = "tempValueRaster.tif";
+            if (File.Exists(tempRaster))
+            {
+                File.Delete(tempRaster);
+            }
             OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("GTiff");
-            
-            outAlignedRaster = outputDriver.Create("tempValueRaster.tif", x_res, y_res, rasterBands, DataType.GDT_Float32, null);
+            outAlignedRaster = outputDriver.Create(tempRaster, x_res, y_res, rasterBands, DataType.GDT_Float32, null);
             
             //Geotransform
             double[] argin = new double[] { envelope.MinX, rasterCellSize, 0, envelope.MaxY, 0, -rasterCellSize };

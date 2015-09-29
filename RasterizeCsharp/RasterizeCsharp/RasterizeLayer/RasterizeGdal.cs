@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using OSGeo.OSR;
@@ -31,9 +32,14 @@ namespace RasterizeCsharp.RasterizeLayer
             //Register the raster drivers
             Gdal.AllRegister();
 
-            //Create new tiff in memory
+            //Create new tiff in disk
+            string tempRaster = "tempZoneRaster.tif";
+            if(File.Exists(tempRaster))
+            {
+                File.Delete(tempRaster);
+            }
             OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("GTiff");
-            outputDataset = outputDriver.Create("tempZoneRaster.tif", x_res, y_res, 1, DataType.GDT_Float32, null);
+            outputDataset = outputDriver.Create(tempRaster, x_res, y_res, 1, DataType.GDT_Float32, null);
 
             //Extrac srs from input feature 
             string inputShapeSrs;
