@@ -11,8 +11,7 @@ namespace RasterizeCsharp.ZonalStatistics
 {
     class ComputeStatistics
     {
-
-        private static Dictionary<int, StatisticsInfo> _zonalValues = new Dictionary<int, StatisticsInfo>();
+        private static Dictionary<int, StatisticsInfo>[] _rasInfoDict;
 
         private static string _zoneFile;
         private static double _cellSize;
@@ -34,30 +33,28 @@ namespace RasterizeCsharp.ZonalStatistics
             ReadRasterBlocks(ref alignedValueRaster, ref zoneRaster);
         }
 
-        private static void ProcessEachRasterBlock(double[] valueRasterValues, double[] zoneRasterValues)
+        private static void ProcessEachRasterBlock(double[] valueRasterValues, double[] zoneRasterValues, int band, ref Dictionary<int, StatisticsInfo>[] rasInfoDict)
         {
             for (int index = 0; index < valueRasterValues.Length; index++)
             {
                 //Skip no data values as in ESRI
                 if ((Math.Round(zoneRasterValues[index], 3) != GdalUtilConstants.NoDataValue) && (Math.Round(valueRasterValues[index], 3) != GdalUtilConstants.NoDataValue))
                 {
-                    int zoneRasterPixelValue = Convert.ToInt32(zoneRasterValues[index]);
+                    int pixelValueFromZone = Convert.ToInt32(zoneRasterValues[index]);
+                    double pixelValueFromValue = valueRasterValues[index];
 
-                    double valueRasterPixelValue = valueRasterValues[index];
-
-                    if (_zonalValues.ContainsKey(zoneRasterPixelValue))
+                    //process each pixel value
+                    if (rasInfoDict[band].ContainsKey(Convert.ToInt32(pixelValueFromZone)))
                     {
-                        StatisticsInfo statisticsInfo = _zonalValues[zoneRasterPixelValue];
+                        StatisticsInfo rastStatistics = rasInfoDict[band][Convert.ToInt32(pixelValueFromZone)];
+                        rastStatistics.Count++;
+                        rastStatistics.Sum = rastStatistics.Sum + pixelValueFromValue;
 
-                        statisticsInfo.Count++;
-                        statisticsInfo.Sum = statisticsInfo.Sum + valueRasterPixelValue;
-
-                        _zonalValues[zoneRasterPixelValue] = statisticsInfo;
-
+                        rasInfoDict[band][Convert.ToInt32(pixelValueFromZone)] = rastStatistics;
                     }
                     else
                     {
-                        _zonalValues[zoneRasterPixelValue] = new StatisticsInfo() { Count = 1, Sum = valueRasterPixelValue };
+                        rasInfoDict[band][Convert.ToInt32(pixelValueFromZone)] = new StatisticsInfo() { Count = 1, Sum = pixelValueFromValue };
                     }
 
                 }
@@ -67,6 +64,8 @@ namespace RasterizeCsharp.ZonalStatistics
 
         private static void ReadRasterBlocks(ref Dataset valueRaster, ref Dataset zoneRaster)
         {
+            _rasInfoDict = new Dictionary<int, StatisticsInfo>[valueRaster.RasterCount];
+
             int valueRasterBandCount = valueRaster.RasterCount;
 
             int rasterRows = zoneRaster.RasterYSize;
@@ -74,10 +73,13 @@ namespace RasterizeCsharp.ZonalStatistics
             
             const int blockSize = AppUtils.GdalUtilConstants.RasterBlockSize;
 
-            for (int rasBand = 1; rasBand <= valueRasterBandCount; rasBand++)
+            for (int rasBand = 0; rasBand < valueRasterBandCount; rasBand++)
             {
-                Band bandValueRaster = valueRaster.GetRasterBand(rasBand);
+                Band bandValueRaster = valueRaster.GetRasterBand(rasBand+1);
                 Band bandZoneRaster = zoneRaster.GetRasterBand(1);
+
+                _rasInfoDict[rasBand] = new Dictionary<int, StatisticsInfo>();
+                Console.WriteLine("rasband: {0}",rasBand);
 
                 for (int row = 0; row < rasterRows; row += blockSize)
                 {
@@ -108,16 +110,18 @@ namespace RasterizeCsharp.ZonalStatistics
 
                         bandValueRaster.ReadRaster(col, row, colProcess, rowProcess, valueRasterValues, colProcess, rowProcess, 0, 0);
                         bandZoneRaster.ReadRaster(col, row, colProcess, rowProcess, zoneRasterValues, colProcess, rowProcess, 0, 0);
-
-                        ProcessEachRasterBlock(valueRasterValues, zoneRasterValues);
+                        Console.WriteLine(row+"<-->"+col);
+                        ProcessEachRasterBlock(valueRasterValues, zoneRasterValues, rasBand, ref _rasInfoDict);
                     }
                 }
 
             }
 
 
-            StatisticsExport writer = new StatisticsExport(_zoneFile);
-            writer.ExportZonalStatistics2(ref _zonalValues, _cellSize);
+            //StatisticsExport writer = new StatisticsExport(_zoneFile);
+            //writer.ExportZonalStatistics2(ref _zonalValues, _cellSize);
+
+            Console.WriteLine("zonal completed!");
         }
 
 
