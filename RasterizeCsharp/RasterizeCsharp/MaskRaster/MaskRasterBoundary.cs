@@ -34,11 +34,14 @@ namespace RasterizeCsharp.MaskRaster
             Gdal.AllRegister();
             
             Dataset oldRasterDataset = Gdal.Open(rasterName, Access.GA_ReadOnly);
+
+            //No of bands in older dataset
+            int rasterBands = oldRasterDataset.RasterCount;
            
             //Create new tiff in memory
             OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("GTiff");
             
-            outAlignedRaster = outputDriver.Create("tempValueRaster.tif", x_res, y_res, 1, DataType.GDT_Float32, null);
+            outAlignedRaster = outputDriver.Create("tempValueRaster.tif", x_res, y_res, rasterBands, DataType.GDT_Float32, null);
             
             //Geotransform
             double[] argin = new double[] { envelope.MinX, rasterCellSize, 0, envelope.MaxY, 0, -rasterCellSize };
@@ -46,22 +49,25 @@ namespace RasterizeCsharp.MaskRaster
 
             
             //Set no data
-            Band band = outAlignedRaster.GetRasterBand(1);
+            for(int rasBand = 1; rasBand<=rasterBands; rasBand++)
+            {
+                Band band = outAlignedRaster.GetRasterBand(rasBand);
+                band.Fill(GdalUtilConstants.NoDataValue, 0.0);
+            }
+            
             //band.SetNoDataValue(GdalUtilConstants.NoDataValue);
             outAlignedRaster.SetProjection(inputShapeSrs);
 
-            band.Fill(GdalUtilConstants.NoDataValue, 0.0);
+            
 
             string[] reprojectOptions = {"NUM_THREADS = ALL_CPUS","WRITE_FLUSH = YES" };
 
             Gdal.ReprojectImage(oldRasterDataset, outAlignedRaster, null, inputShapeSrs, ResampleAlg.GRA_NearestNeighbour,0.0, 0.0, null, null, reprojectOptions);
             
             //flush cache
-            band.FlushCache();
             vectorDataSource.FlushCache();
             oldRasterDataset.FlushCache();
 
-            band.Dispose();
             vectorDataSource.Dispose();
             oldRasterDataset.Dispose();
             

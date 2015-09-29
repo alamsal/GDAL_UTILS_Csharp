@@ -37,10 +37,9 @@ namespace RasterizeCsharp
             string folder =@"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik";
             string fileName = "Whetstone_20080229SoilEnh.img";
            
-            ZonalStatisticsEsri.OpenFileRasterDataset(folder, fileName,inputShapeFile,infieldName,outRasterCellSize);
-
-           
-
+            //ZonalStatisticsEsri.OpenFileRasterDataset(folder, fileName,inputShapeFile,infieldName,outRasterCellSize);
+            string invalRast = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\Whetstone_20080229SoilEnh.img";
+            ComputeStatistics.ComputeZonalStatistics(invalRast, inputShapeFile, infieldName, outRasterCellSize, outZonalCsv);
 
 
             Console.ReadLine();
