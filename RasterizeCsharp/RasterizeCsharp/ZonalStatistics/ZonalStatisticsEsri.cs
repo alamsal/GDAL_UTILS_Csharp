@@ -8,6 +8,7 @@ using ESRI.ArcGIS.esriSystem;
 
 using RasterizeCsharp.RasterizeLayer;
 using RasterizeCsharp.ZonalIO;
+using RasterizeCsharp.MaskRaster;
 
 namespace RasterizeCsharp.ZonalStatistics
 {
@@ -100,7 +101,7 @@ namespace RasterizeCsharp.ZonalStatistics
             EnableEsriLiscences();
 
             //Get feature raster from feature shp
-            string outTempRasterName = "tempRasterFromESRI.tif";
+            string outTempRasterName = "tempZoneRasterFromESRI.tif";
             string outZoneRater = inFolderName + "\\" + outTempRasterName;
             int rasterBlockSize = 1024;
             RasterizeEsri.Rasterize(inFeatureName, outZoneRater, inFieldName, outCellSize);
@@ -109,6 +110,13 @@ namespace RasterizeCsharp.ZonalStatistics
             IWorkspaceFactory workspaceFactory = new RasterWorkspaceFactoryClass();
             IRasterWorkspace rasterWorkspace = (IRasterWorkspace)workspaceFactory.OpenFromFile(inFolderName, 0);
 
+            //Align raster
+            string inValueRaster = inFolderName + "\\" + inRasterDatasetName;
+            string inClipFeature = inFeatureName;
+            string outClippedRasterName = "tempValueRasterFromESRI.img";
+            string outClippedValueRaster = inFolderName + "\\" + outClippedRasterName;
+
+            ClipRasterBoundaryEsri.ClipRaster(inValueRaster, inClipFeature , outClippedValueRaster);
 
             //Open zone raster dataset
             IRasterDataset zoneRasterDataset = rasterWorkspace.OpenRasterDataset(outTempRasterName);
@@ -117,7 +125,7 @@ namespace RasterizeCsharp.ZonalStatistics
 
 
             //Open value raster dataset 
-            IRasterDataset valueRasterDataset = rasterWorkspace.OpenRasterDataset(inRasterDatasetName);
+            IRasterDataset valueRasterDataset = rasterWorkspace.OpenRasterDataset(outClippedRasterName);
             IRasterDataset2 valueRasterDataset2 = valueRasterDataset as IRasterDataset2;
             IRaster2 valueRs2 = valueRasterDataset2.CreateFullRaster() as IRaster2;
 
@@ -160,7 +168,7 @@ namespace RasterizeCsharp.ZonalStatistics
                         System.Array zoneRasterPixels = (System.Array)zoneRasterPixelBlock3.get_PixelData(zoneRasterBandId);
                         for (int b = 0; b < valueRasterPlanes.Count; b++)
                         {
-                            Console.WriteLine(b);
+                            //Console.WriteLine(b);
                             //Get pixel array
                             System.Array valueRasterPixels = (System.Array)valueRasterPixelBlock3.get_PixelData(b);
 
@@ -169,22 +177,43 @@ namespace RasterizeCsharp.ZonalStatistics
                                 for (int j = 0; j < blockHeight; j++)
                                 {
                                     //Get pixel value
-                                    object pixelValueFromValue = valueRasterPixels.GetValue(i, j);
-                                    object pixelValueFromZone = zoneRasterPixels.GetValue(i, j);
+                                    object pixelValueFromValue = null;
+                                    object pixelValueFromZone = null;
+                                    try
+                                    {
+                                         pixelValueFromValue = valueRasterPixels.GetValue(i, j);
+                                         pixelValueFromZone = zoneRasterPixels.GetValue(i, j);
+                                    }catch(Exception ex)
+                                    {
+                                        Console.WriteLine(ex.Message);
+                                    }
+
 
                                     //process each pixel value
-                                    if (rasInfoDict[b].ContainsKey(Convert.ToInt32(pixelValueFromZone)))
+                                    try
                                     {
-                                        StatisticsInfo rastStatistics = rasInfoDict[b][Convert.ToInt32(pixelValueFromZone)];
-                                        rastStatistics.Count++;
-                                        rastStatistics.Sum = rastStatistics.Sum + Convert.ToDouble(pixelValueFromValue);
+                                        if (rasInfoDict[b].ContainsKey(Convert.ToInt32(pixelValueFromZone)))
+                                        {
+                                            StatisticsInfo rastStatistics = rasInfoDict[b][Convert.ToInt32(pixelValueFromZone)];
+                                            rastStatistics.Count++;
+                                            rastStatistics.Sum = rastStatistics.Sum + Convert.ToDouble(pixelValueFromValue);
 
-                                        rasInfoDict[b][Convert.ToInt32(pixelValueFromZone)] = rastStatistics;
-                                    }
-                                    else
+                                            rasInfoDict[b][Convert.ToInt32(pixelValueFromZone)] = rastStatistics;
+                                        }
+                                        else
+                                        {
+                                            rasInfoDict[b][Convert.ToInt32(pixelValueFromZone)] = new StatisticsInfo() { Count = 1, Sum = Convert.ToDouble(pixelValueFromValue) };
+                                        }
+                                    }catch(Exception ex)
                                     {
-                                        rasInfoDict[b][Convert.ToInt32(pixelValueFromZone)] = new StatisticsInfo() { Count = 1, Sum = Convert.ToDouble(pixelValueFromValue) };
+                                        Console.WriteLine(ex.Message);
                                     }
+
+                                    //Console.WriteLine(i +"-"+j);
+                                    //Console.WriteLine(pixelValueFromValue + "-" + pixelValueFromZone);
+                                    
+
+                                    
                                 }
                             }
                         }
