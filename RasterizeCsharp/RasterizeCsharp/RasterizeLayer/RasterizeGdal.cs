@@ -39,7 +39,7 @@ namespace RasterizeCsharp.RasterizeLayer
                 File.Delete(tempRaster);
             }
             OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("GTiff");
-            outputDataset = outputDriver.Create(tempRaster, x_res, y_res, 1, DataType.GDT_Float32, null);
+            outputDataset = outputDriver.Create(tempRaster, x_res, y_res, 1, DataType.GDT_Int32, null);
 
             //Extrac srs from input feature 
             string inputShapeSrs;
