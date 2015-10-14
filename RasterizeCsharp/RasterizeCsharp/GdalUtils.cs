@@ -1,5 +1,6 @@
 ﻿using System;
 using RasterizeCsharp.ZonalStatistics;
+using RasterizeCsharp.GdbOperations;
 
 namespace RasterizeCsharp
 {
@@ -7,7 +8,8 @@ namespace RasterizeCsharp
     {
         static void Main(string[] args)
         {
-            
+            /*
+             
             //string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev05.shp";
             //string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik2\smallish dataset\polygons.shp";
             string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik2\TEUI_5__Test_data\state_boundaries_us_100k.shp";
@@ -65,8 +67,12 @@ namespace RasterizeCsharp
             Console.WriteLine(" Input shp: {0}", inputShapeFile);
             Console.WriteLine(" Input raster: {0}", inValueRaster);
             Console.WriteLine(" Output Cell: {0}", outRasterCellSize);
-
             
+
+            */
+            
+
+            GdbUtils.ReadEsriGdb(@"D:\Ashis_Work\GDAL Utilities\sample-data\Geodatabase\EsriZonalOutputs.gdb","Counties");
               
             
             
