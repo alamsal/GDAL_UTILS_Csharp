@@ -1,6 +1,5 @@
 ﻿using System;
 using RasterizeCsharp.ZonalStatistics;
-using RasterizeCsharp.GdbOperations;
 
 namespace RasterizeCsharp
 {
@@ -8,7 +7,7 @@ namespace RasterizeCsharp
     {
         static void Main(string[] args)
         {
-            /*
+            
              
             //string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev05.shp";
             //string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik2\smallish dataset\polygons.shp";
@@ -31,11 +30,16 @@ namespace RasterizeCsharp
             //string inValueRaster = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\Whetstone_20080229SoilEnh.img";
             //string inValueRaster = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\Whetstone_20080229eDOQQMos.tif";
 
-            string inValueRaster = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik2\TEUI_5__Test_data\slope_90m";
-            //string inValueRaster = @"D:\Ashis_Work\GDAL Utilities\sample-data\UtahGrid\dem90_utm83";
+            //string inValueRaster = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik2\TEUI_5__Test_data\slope_90m";
+            string inValueRaster = @"D:\Ashis_Work\GDAL Utilities\sample-data\UtahGrid\dem90_utm83";
             Console.WriteLine("GDAL working...");
             DateTime gdalStart = DateTime.Now;
-            ComputeStatistics.ComputeZonalStatistics(inValueRaster, inputShapeFile, infieldName, outRasterCellSize, outZonalCsvGDAL);
+            //ComputeStatistics.ComputeZonalStatistics(inValueRaster, inputShapeFile, infieldName, outRasterCellSize, outZonalCsvGDAL);
+
+            string gdbPath = @"D:\Ashis_Work\GDAL Utilities\sample-data\Geodatabase\EsriZonalOutputs.gdb";
+
+            ComputeStatistics.ComputeZonalStatisticsUsingFeatureGdb(gdbPath, "Counties", inValueRaster, "COUNTYNBR",
+                                                                    outRasterCellSize, outZonalCsvGDAL);
             
             
             DateTime gdalEnd = DateTime.Now;
@@ -57,7 +61,7 @@ namespace RasterizeCsharp
             //string fileName = "dem90_utm83";
             //string fileName = "Whetstone_20080229eDOQQMos.tif";
 
-            ZonalStatisticsEsri.OpenFileRasterDataset(folder, fileName, inputShapeFile, infieldName, outRasterCellSize, outZonalCsvESRI);
+            //ZonalStatisticsEsri.OpenFileRasterDataset(folder, fileName, inputShapeFile, infieldName, outRasterCellSize, outZonalCsvESRI);
           
             DateTime esriEnd = DateTime.Now;
 
@@ -67,15 +71,12 @@ namespace RasterizeCsharp
             Console.WriteLine(" Input shp: {0}", inputShapeFile);
             Console.WriteLine(" Input raster: {0}", inValueRaster);
             Console.WriteLine(" Output Cell: {0}", outRasterCellSize);
+
             
 
-            */
-            
 
-            GdbUtils.ReadEsriGdb(@"D:\Ashis_Work\GDAL Utilities\sample-data\Geodatabase\EsriZonalOutputs.gdb","Counties");
-              
-            
-            
+
+
             Console.WriteLine("Done");
             Console.ReadLine();
 

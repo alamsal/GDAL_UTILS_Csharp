@@ -22,16 +22,34 @@ namespace RasterizeCsharp.ZonalStatistics
             Dataset zoneRaster;
 
             //Step 1: Convert feature to raster
-            RasterizeGdal.Rasterize(featureName, out zoneRaster, featureFieldName, cellSize);
+            RasterizeLayerGdal.RasterizeFeature(featureName, out zoneRaster, featureFieldName, cellSize);
 
             //Step 2: Align/mask value raster with step1's output raster
-            MaskRasterBoundary.ClipRaster(featureName, valueRasterName, cellSize, out alignedValueRaster);
+            MaskRasterBoundary.ClipRasterUsingFeature(featureName, valueRasterName, cellSize, out alignedValueRaster);
             _zoneFile = zoneOutputFile;
             _cellSize = cellSize;
 
             //Setp 3: Feed both raster into an algorithm
             ReadRasterBlocks(ref alignedValueRaster, ref zoneRaster);
         }
+
+        public static void ComputeZonalStatisticsUsingFeatureGdb(string gdbPath,string featureLayerName,string valueRasterName,string featureFieldName,double cellSize,string zoneOutputFile)
+        {
+            Dataset alignedValueRaster;
+            Dataset zoneRaster;
+
+            //Step 1: Convert feature to raster
+            RasterizeLayerGdal.RasterizeGdbFeature(gdbPath,featureLayerName, out zoneRaster, featureFieldName, cellSize);
+
+            //Step 2: Align/mask value raster with step1's output raster
+            MaskRasterBoundary.ClipRasterUsingGdbFeature(gdbPath,featureLayerName,valueRasterName, cellSize, out alignedValueRaster);
+            _zoneFile = zoneOutputFile;
+            _cellSize = cellSize;
+
+            //Setp 3: Feed both raster into an algorithm
+            ReadRasterBlocks(ref alignedValueRaster, ref zoneRaster);
+        }
+
 
         private static void ProcessEachRasterBlock(double[] valueRasterValues, double[] zoneRasterValues, int band, ref Dictionary<int, StatisticsInfo>[] rasInfoDict)
         {

@@ -7,17 +7,10 @@ using RasterizeCsharp.AppUtils;
 
 namespace RasterizeCsharp.RasterizeLayer
 {
-    class RasterizeGdal
+    class ConversionGdal
     {
-        public static void Rasterize(string inputFeature, out Dataset outputDataset, string fieldName, double rasterCellSize)
+        public static void ConvertFeatureToRaster(Layer layer, out Dataset outputDataset, double rasterCellSize, string fieldName)
         {
-            //Register the vector drivers
-            Ogr.RegisterAll();
-
-            //Reading the vector data
-            DataSource dataSource = Ogr.Open(inputFeature, 0);
-            Layer layer = dataSource.GetLayerByIndex(0);
-
             Envelope envelope = new Envelope();
             layer.GetExtent(envelope, 0);
 
@@ -34,7 +27,7 @@ namespace RasterizeCsharp.RasterizeLayer
 
             //Create new tiff in disk
             string tempRaster = "tempZoneRaster.tif";
-            if(File.Exists(tempRaster))
+            if (File.Exists(tempRaster))
             {
                 File.Delete(tempRaster);
             }
@@ -56,7 +49,7 @@ namespace RasterizeCsharp.RasterizeLayer
             //Set no data
             Band band = outputDataset.GetRasterBand(1);
             //band.SetNoDataValue(GdalUtilConstants.NoDataValue);
-            band.Fill(GdalUtilConstants.NoDataValue,0.0);
+            band.Fill(GdalUtilConstants.NoDataValue, 0.0);
 
             //Feature to raster rasterize layer options
 
@@ -78,8 +71,7 @@ namespace RasterizeCsharp.RasterizeLayer
             //Gdal.RasterizeLayer(myDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, null, null, null); // To burn the given burn values instead of feature attributes
             //Gdal.RasterizeLayer(outputDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, rasterizeOptions, new Gdal.GDALProgressFuncDelegate(ProgressFunc), "Raster conversion");
 
-            Gdal.RasterizeLayer(outputDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, rasterizeOptions, null,null);
-
+            Gdal.RasterizeLayer(outputDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, rasterizeOptions, null, null);
         }
 
         private static int ProgressFunc(double complete, IntPtr message, IntPtr data)

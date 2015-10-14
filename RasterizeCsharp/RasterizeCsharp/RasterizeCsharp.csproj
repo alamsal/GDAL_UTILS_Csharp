@@ -65,14 +65,16 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppUtils\DriverUtils.cs" />
+    <Compile Include="AppUtils\ReadFeature.cs" />
     <Compile Include="AppUtils\CustomException.cs" />
-    <Compile Include="GdbOperations\GdbUtils.cs" />
     <Compile Include="MaskRaster\ClipRasterBoundaryEsri.cs" />
+    <Compile Include="RasterizeLayer\RasterizeLayerGdal.cs" />
     <Compile Include="ZonalStatistics\StatisticsInfo.cs" />
     <Compile Include="MaskRaster\MaskRasterBoundary.cs" />
     <Compile Include="ZonalIO\StatisticsExport.cs" />
     <Compile Include="RasterizeLayer\RasterizeEsri.cs" />
-    <Compile Include="RasterizeLayer\RasterizeGdal.cs" />
+    <Compile Include="RasterizeLayer\ConversionGdal.cs" />
     <Compile Include="GdalUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ZonalStatistics\ComputeStatistics.cs" />
