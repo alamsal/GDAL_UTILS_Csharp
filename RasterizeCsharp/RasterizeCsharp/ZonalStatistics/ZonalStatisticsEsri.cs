@@ -113,7 +113,7 @@ namespace RasterizeCsharp.ZonalStatistics
             //Align raster
             string inValueRaster = inFolderName + "\\" + inRasterDatasetName;
             string inClipFeature = inFeatureName;
-            string outClippedRasterName = "tempValueRasterFromESRI.img";
+            string outClippedRasterName = "tempValueRasterFromESRI.tif";
             string outClippedValueRaster = inFolderName + "\\" + outClippedRasterName;
 
             ClipRasterBoundaryEsri.ClipRaster(inValueRaster, inClipFeature , outClippedValueRaster);
