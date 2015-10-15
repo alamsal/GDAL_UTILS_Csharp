@@ -133,6 +133,13 @@ namespace RasterizeCsharp.ZonalStatistics
             StatisticsExport writer = new StatisticsExport(_zoneFile);
             writer.ExportZonalStatistics2(ref _rasInfoDict, _cellSize);
 
+            //flush rasters cache
+            valueRaster.FlushCache();
+            zoneRaster.FlushCache();
+
+            valueRaster.Dispose();
+            zoneRaster.Dispose();
+
         }
     }
 }
