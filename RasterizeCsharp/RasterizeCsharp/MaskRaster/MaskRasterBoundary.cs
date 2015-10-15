@@ -15,7 +15,7 @@ namespace RasterizeCsharp.MaskRaster
             ReadFeature readFeature = new ReadFeature(inFeatureName);
             Layer layer = readFeature.GetFeatureLayer();
 
-            StartClippingProcess(layer,inRasterName,rasterCellSize,out outAlignedRaster);
+            StartClippingProcess(layer, inRasterName, rasterCellSize, out outAlignedRaster);
         }
 
         public static void ClipRasterUsingGdbFeature(string gdbPath, string inFeatureLayerName, string inRasterName, double rasterCellSize, out Dataset outAlignedRaster)

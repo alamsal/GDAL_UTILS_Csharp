@@ -8,18 +8,18 @@ namespace RasterizeCsharp.RasterizeLayer
     {
         public static void RasterizeFeature(string inputFeature, out Dataset outputDataset, string fieldName, double rasterCellSize)
         {
-           ReadFeature readFeature = new ReadFeature(inputFeature);
-           Layer layer = readFeature.GetFeatureLayer();
-           
-           ConversionGdal.ConvertFeatureToRaster(layer,out outputDataset,rasterCellSize,fieldName);
-        }
-
-        public static void RasterizeGdbFeature(string gdbPath,string inputeFeatureLayer,out Dataset outputDataset, string fieldName, double rasterCellSize)
-        {
-            ReadFeature readFeature = new ReadFeature(gdbPath,inputeFeatureLayer);
+            ReadFeature readFeature = new ReadFeature(inputFeature);
             Layer layer = readFeature.GetFeatureLayer();
 
-            ConversionGdal.ConvertFeatureToRaster(layer, out outputDataset,rasterCellSize,fieldName);
+            ConversionGdal.ConvertFeatureToRaster(layer, out outputDataset, rasterCellSize, fieldName);
+        }
+
+        public static void RasterizeGdbFeature(string gdbPath, string inputeFeatureLayer, out Dataset outputDataset, string fieldName, double rasterCellSize)
+        {
+            ReadFeature readFeature = new ReadFeature(gdbPath, inputeFeatureLayer);
+            Layer layer = readFeature.GetFeatureLayer();
+
+            ConversionGdal.ConvertFeatureToRaster(layer, out outputDataset, rasterCellSize, fieldName);
         }
     }
 }

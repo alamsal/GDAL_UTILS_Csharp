@@ -111,12 +111,11 @@ namespace RasterizeCsharp.ZonalIO
                         {
                             w.Flush();
                         }
-
                     }
                 }
-
             }
-
         }
+
+
     }
 }

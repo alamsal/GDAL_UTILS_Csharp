@@ -5,7 +5,6 @@ using RasterizeCsharp.AppUtils;
 using RasterizeCsharp.ZonalIO;
 using RasterizeCsharp.RasterizeLayer;
 using RasterizeCsharp.MaskRaster;
-using RasterizeCsharp.ZonalStatistics;
 
 namespace RasterizeCsharp.ZonalStatistics
 {
@@ -33,16 +32,16 @@ namespace RasterizeCsharp.ZonalStatistics
             ReadRasterBlocks(ref alignedValueRaster, ref zoneRaster);
         }
 
-        public static void ComputeZonalStatisticsUsingFeatureGdb(string gdbPath,string featureLayerName,string valueRasterName,string featureFieldName,double cellSize,string zoneOutputFile)
+        public static void ComputeZonalStatisticsUsingFeatureGdb(string gdbPath, string featureLayerName, string valueRasterName, string featureFieldName, double cellSize, string zoneOutputFile)
         {
             Dataset alignedValueRaster;
             Dataset zoneRaster;
 
             //Step 1: Convert feature to raster
-            RasterizeLayerGdal.RasterizeGdbFeature(gdbPath,featureLayerName, out zoneRaster, featureFieldName, cellSize);
+            RasterizeLayerGdal.RasterizeGdbFeature(gdbPath, featureLayerName, out zoneRaster, featureFieldName, cellSize);
 
             //Step 2: Align/mask value raster with step1's output raster
-            MaskRasterBoundary.ClipRasterUsingGdbFeature(gdbPath,featureLayerName,valueRasterName, cellSize, out alignedValueRaster);
+            MaskRasterBoundary.ClipRasterUsingGdbFeature(gdbPath, featureLayerName, valueRasterName, cellSize, out alignedValueRaster);
             _zoneFile = zoneOutputFile;
             _cellSize = cellSize;
 
@@ -74,9 +73,7 @@ namespace RasterizeCsharp.ZonalStatistics
                     {
                         rasInfoDict[band][Convert.ToInt32(pixelValueFromZone)] = new StatisticsInfo() { Count = 1, Sum = pixelValueFromValue };
                     }
-
                 }
-
             }
         }
 
@@ -88,16 +85,16 @@ namespace RasterizeCsharp.ZonalStatistics
 
             int rasterRows = zoneRaster.RasterYSize;
             int rasterCols = zoneRaster.RasterXSize;
-            
+
             const int blockSize = AppUtils.GdalUtilConstants.RasterBlockSize;
 
             for (int rasBand = 0; rasBand < valueRasterBandCount; rasBand++)
             {
-                Band bandValueRaster = valueRaster.GetRasterBand(rasBand+1);
+                Band bandValueRaster = valueRaster.GetRasterBand(rasBand + 1);
                 Band bandZoneRaster = zoneRaster.GetRasterBand(1);
 
                 _rasInfoDict[rasBand] = new Dictionary<int, StatisticsInfo>();
-               
+
                 for (int row = 0; row < rasterRows; row += blockSize)
                 {
                     int rowProcess;
@@ -127,21 +124,15 @@ namespace RasterizeCsharp.ZonalStatistics
 
                         bandValueRaster.ReadRaster(col, row, colProcess, rowProcess, valueRasterValues, colProcess, rowProcess, 0, 0);
                         bandZoneRaster.ReadRaster(col, row, colProcess, rowProcess, zoneRasterValues, colProcess, rowProcess, 0, 0);
-                        
+
                         ProcessEachRasterBlock(valueRasterValues, zoneRasterValues, rasBand, ref _rasInfoDict);
                     }
                 }
-
             }
-
 
             StatisticsExport writer = new StatisticsExport(_zoneFile);
             writer.ExportZonalStatistics2(ref _rasInfoDict, _cellSize);
 
-           
         }
-
-
-
     }
 }
