@@ -11,6 +11,8 @@ namespace RasterizeCsharp.RasterizeLayer
     {
         public static void ConvertFeatureToRaster(Layer layer, out Dataset outputDataset, double rasterCellSize, string fieldName)
         {
+            DriverUtils.RegisterGdalOgrDrivers();
+
             Envelope envelope = new Envelope();
             layer.GetExtent(envelope, 0);
 
@@ -21,9 +23,6 @@ namespace RasterizeCsharp.RasterizeLayer
             //Console.WriteLine("Extent: " + envelope.MaxX + " " + envelope.MinX + " " + envelope.MaxY + " " + envelope.MinY);
             //Console.WriteLine("X resolution: " + x_res);
             //Console.WriteLine("X resolution: " + y_res);
-
-            //Register the raster drivers
-            Gdal.AllRegister();
 
             //Create new tiff in disk
             string tempRaster = "tempZoneRaster.tif";
@@ -90,9 +89,5 @@ namespace RasterizeCsharp.RasterizeLayer
             Console.WriteLine("");
             return 1;
         }
-
-
-
-
     }
 }

@@ -31,9 +31,5 @@ namespace RasterizeCsharp.AppUtils
         {
             return _layer;
         }
-
-       
-
-
     }
 }

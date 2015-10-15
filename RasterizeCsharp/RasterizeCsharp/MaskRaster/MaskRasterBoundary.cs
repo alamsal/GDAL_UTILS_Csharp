@@ -12,17 +12,14 @@ namespace RasterizeCsharp.MaskRaster
     {
         public static void ClipRasterUsingFeature(string inFeatureName, string inRasterName, double rasterCellSize, out Dataset outAlignedRaster)
         {
-            DriverUtils.RegisterGdalOgrDrivers();
             ReadFeature readFeature = new ReadFeature(inFeatureName);
             Layer layer = readFeature.GetFeatureLayer();
 
             StartClippingProcess(layer,inRasterName,rasterCellSize,out outAlignedRaster);
-
         }
 
         public static void ClipRasterUsingGdbFeature(string gdbPath, string inFeatureLayerName, string inRasterName, double rasterCellSize, out Dataset outAlignedRaster)
         {
-            DriverUtils.RegisterGdalOgrDrivers();
             ReadFeature readFeature = new ReadFeature(gdbPath, inFeatureLayerName);
             Layer layer = readFeature.GetFeatureLayer();
 
@@ -31,6 +28,8 @@ namespace RasterizeCsharp.MaskRaster
 
         private static void StartClippingProcess(Layer layer, string rasterName, double rasterCellSize, out Dataset outAlignedRaster)
         {
+            DriverUtils.RegisterGdalOgrDrivers();
+
             //Extrac srs from input feature 
             string inputShapeSrs;
             SpatialReference spatialRefrence = layer.GetSpatialRef();
@@ -54,6 +53,7 @@ namespace RasterizeCsharp.MaskRaster
             {
                 File.Delete(tempRaster);
             }
+
             OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("GTiff");
             outAlignedRaster = outputDriver.Create(tempRaster, x_res, y_res, rasterBands, DataType.GDT_Float32, null);
 
@@ -72,24 +72,12 @@ namespace RasterizeCsharp.MaskRaster
             //band.SetNoDataValue(GdalUtilConstants.NoDataValue);
             outAlignedRaster.SetProjection(inputShapeSrs);
 
-
-
             string[] reprojectOptions = { "NUM_THREADS = ALL_CPUS", "WRITE_FLUSH = YES" };
-
             Gdal.ReprojectImage(oldRasterDataset, outAlignedRaster, null, inputShapeSrs, ResampleAlg.GRA_NearestNeighbour, 0.0, 0.0, null, null, reprojectOptions);
 
             //flush cache
-
-            
-
-
             oldRasterDataset.FlushCache();
             oldRasterDataset.Dispose();
         }
-
-
     }
-
-
-
 }
