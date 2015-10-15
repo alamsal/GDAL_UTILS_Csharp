@@ -11,11 +11,11 @@ namespace RasterizeCsharp
              
             //string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev05.shp";
             //string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik2\smallish dataset\polygons.shp";
-            string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik2\TEUI_5__Test_data\state_boundaries_us_100k.shp";
-            //string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\UtahGrid\Counties.shp";
+            //string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik2\TEUI_5__Test_data\state_boundaries_us_100k.shp";
+            string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\UtahGrid\Counties.shp";
 
-            //string infieldName = "FIPS";
-            string infieldName = "STATE_FIPS";
+            string infieldName = "FIPS";
+            //string infieldName = "STATE_FIPS";
             //string infieldName = "Id";
             //string infieldName = "OBJECTID";
             //int outRasterCellSize =30;
@@ -34,19 +34,19 @@ namespace RasterizeCsharp
             string inValueRaster = @"D:\Ashis_Work\GDAL Utilities\sample-data\UtahGrid\dem90_utm83";
             Console.WriteLine("GDAL working...");
             DateTime gdalStart = DateTime.Now;
+            
             //ComputeStatistics.ComputeZonalStatistics(inValueRaster, inputShapeFile, infieldName, outRasterCellSize, outZonalCsvGDAL);
 
             string gdbPath = @"D:\Ashis_Work\GDAL Utilities\sample-data\Geodatabase\EsriZonalOutputs.gdb";
 
-            ComputeStatistics.ComputeZonalStatisticsUsingFeatureGdb(gdbPath, "Counties", inValueRaster, "COUNTYNBR",
-                                                                    outRasterCellSize, outZonalCsvGDAL);
+            ComputeStatistics.ComputeZonalStatisticsUsingFeatureGdb(gdbPath, "Counties", inValueRaster, infieldName,outRasterCellSize, outZonalCsvGDAL);
             
             
             DateTime gdalEnd = DateTime.Now;
 
             TimeSpan gdalTimeSpan = gdalEnd - gdalStart;
             Console.WriteLine("Total time GDAL: {0}",gdalTimeSpan);
-
+            /*
             Console.WriteLine("Esri working ...");
             DateTime esriStart = DateTime.Now;
             
@@ -73,12 +73,13 @@ namespace RasterizeCsharp
             Console.WriteLine(" Output Cell: {0}", outRasterCellSize);
 
             
-
+            */
 
 
 
             Console.WriteLine("Done");
-            Console.ReadLine();
+            Environment.Exit(0);
+            
 
         }
 

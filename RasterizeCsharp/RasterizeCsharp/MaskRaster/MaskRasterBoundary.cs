@@ -79,6 +79,10 @@ namespace RasterizeCsharp.MaskRaster
             Gdal.ReprojectImage(oldRasterDataset, outAlignedRaster, null, inputShapeSrs, ResampleAlg.GRA_NearestNeighbour, 0.0, 0.0, null, null, reprojectOptions);
 
             //flush cache
+
+            
+
+
             oldRasterDataset.FlushCache();
             oldRasterDataset.Dispose();
         }
