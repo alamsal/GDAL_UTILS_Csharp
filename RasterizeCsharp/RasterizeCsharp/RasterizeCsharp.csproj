@@ -52,9 +52,6 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="ESRI.ArcGIS.Version, Version=10.0.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=x86" />
-    <Reference Include="gdalconst_csharp">
-      <HintPath>C:\GDAL\gdal\csharp\gdalconst_csharp.dll</HintPath>
-    </Reference>
     <Reference Include="gdal_csharp">
       <HintPath>C:\GDAL\gdal\csharp\gdal_csharp.dll</HintPath>
     </Reference>
