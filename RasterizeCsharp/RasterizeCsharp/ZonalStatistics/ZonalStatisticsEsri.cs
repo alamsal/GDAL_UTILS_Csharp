@@ -96,7 +96,7 @@ namespace RasterizeCsharp.ZonalStatistics
 
         }
 
-        public static void OpenFileRasterDataset(string inFolderName, string inRasterDatasetName, string inFeatureName, string inFieldName, int outCellSize, string outSummaryFile)
+        public static void OpenFileRasterDataset(string inFolderName, string inRasterDatasetName, string inFeatureName, string inFieldName, double outCellSize, string outSummaryFile)
         {
             EnableEsriLiscences();
 
@@ -157,8 +157,10 @@ namespace RasterizeCsharp.ZonalStatistics
                     IPixelBlock3 zoneRasterPixelBlock3 = zoneRasterCursor.PixelBlock as IPixelBlock3;
 
                     //No Idea how esri cursor fills the raster gap if zone is greater than value, so quick and fix using smallest extent
+                    
                     int blockWidth = valueRasterPixelBlock3.Width < zoneRasterPixelBlock3.Width ? valueRasterPixelBlock3.Width : zoneRasterPixelBlock3.Width;
                     int blockHeight = valueRasterPixelBlock3.Height < zoneRasterPixelBlock3.Height ? valueRasterPixelBlock3.Height : zoneRasterPixelBlock3.Height;
+
 
                     //Console.WriteLine(zoneRasterPixelBlock3.Width);
                     //Console.WriteLine(blockWidth);
