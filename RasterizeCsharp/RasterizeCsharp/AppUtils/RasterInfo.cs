@@ -8,6 +8,7 @@
 
     public static class GdalUtilConstants
     {
-        public const double NoDataValue = -99999.9;
+        public const double NoDataValue = -999.0;
+        public const int RasterBlockSize = 512;
     }
 }

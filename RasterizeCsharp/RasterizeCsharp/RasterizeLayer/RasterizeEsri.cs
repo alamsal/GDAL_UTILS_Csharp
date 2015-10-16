@@ -6,7 +6,7 @@ namespace RasterizeCsharp.RasterizeLayer
 {
     class RasterizeEsri
     {
-        public static void Rasterize(string inputFeature, string outRaster, string fieldName, int cellSize)
+        public static void Rasterize(string inputFeature, string outRaster, string fieldName, double cellSize)
         {
             try
             {

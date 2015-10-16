@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using OSGeo.GDAL;
 using OSGeo.OGR;
 using OSGeo.OSR;
@@ -6,16 +7,11 @@ using RasterizeCsharp.AppUtils;
 
 namespace RasterizeCsharp.RasterizeLayer
 {
-    class RasterizeGdal
+    class ConversionGdal
     {
-        public static void Rasterize(string inputFeature, out Dataset outputDataset, string fieldName, double rasterCellSize)
+        public static void ConvertFeatureToRaster(Layer layer, out Dataset outputDataset, double rasterCellSize, string fieldName)
         {
-            //Register the vector drivers
-            Ogr.RegisterAll();
-
-            //Reading the vector data
-            DataSource dataSource = Ogr.Open(inputFeature, 0);
-            Layer layer = dataSource.GetLayerByIndex(0);
+            DriverUtils.RegisterGdalOgrDrivers();
 
             Envelope envelope = new Envelope();
             layer.GetExtent(envelope, 0);
@@ -24,16 +20,18 @@ namespace RasterizeCsharp.RasterizeLayer
             int x_res = Convert.ToInt32((envelope.MaxX - envelope.MinX) / rasterCellSize);
             int y_res = Convert.ToInt32((envelope.MaxY - envelope.MinY) / rasterCellSize);
 
-            Console.WriteLine("Extent: " + envelope.MaxX + " " + envelope.MinX + " " + envelope.MaxY + " " + envelope.MinY);
-            Console.WriteLine("X resolution: " + x_res);
-            Console.WriteLine("X resolution: " + y_res);
+            //Console.WriteLine("Extent: " + envelope.MaxX + " " + envelope.MinX + " " + envelope.MaxY + " " + envelope.MinY);
+            //Console.WriteLine("X resolution: " + x_res);
+            //Console.WriteLine("X resolution: " + y_res);
 
-            //Register the raster drivers
-            Gdal.AllRegister();
-
-            //Create new tiff in memory
-            OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("MEM");
-            outputDataset = outputDriver.Create("", x_res, y_res, 1, DataType.GDT_Float64, null);
+            //Create new tiff in disk
+            string tempRaster = "tempZoneRaster.tif";
+            if (File.Exists(tempRaster))
+            {
+                File.Delete(tempRaster);
+            }
+            OSGeo.GDAL.Driver outputDriver = Gdal.GetDriverByName("GTiff");
+            outputDataset = outputDriver.Create(tempRaster, x_res, y_res, 1, DataType.GDT_Int32, null);
 
             //Extrac srs from input feature 
             string inputShapeSrs;
@@ -49,8 +47,8 @@ namespace RasterizeCsharp.RasterizeLayer
 
             //Set no data
             Band band = outputDataset.GetRasterBand(1);
-            band.SetNoDataValue(GdalUtilConstants.NoDataValue);
-            band.Fill(GdalUtilConstants.NoDataValue,0.0);
+            //band.SetNoDataValue(GdalUtilConstants.NoDataValue);
+            band.Fill(GdalUtilConstants.NoDataValue, 0.0);
 
             //Feature to raster rasterize layer options
 
@@ -70,8 +68,9 @@ namespace RasterizeCsharp.RasterizeLayer
 
             //Rasterize layer
             //Gdal.RasterizeLayer(myDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, null, null, null); // To burn the given burn values instead of feature attributes
-            Gdal.RasterizeLayer(outputDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, rasterizeOptions, new Gdal.GDALProgressFuncDelegate(ProgressFunc), "Raster conversion");
+            //Gdal.RasterizeLayer(outputDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, rasterizeOptions, new Gdal.GDALProgressFuncDelegate(ProgressFunc), "Raster conversion");
 
+            Gdal.RasterizeLayer(outputDataset, 1, bandlist, layer, IntPtr.Zero, IntPtr.Zero, 1, burnValues, rasterizeOptions, null, null);
         }
 
         private static int ProgressFunc(double complete, IntPtr message, IntPtr data)
@@ -90,9 +89,5 @@ namespace RasterizeCsharp.RasterizeLayer
             Console.WriteLine("");
             return 1;
         }
-
-
-
-
     }
 }
