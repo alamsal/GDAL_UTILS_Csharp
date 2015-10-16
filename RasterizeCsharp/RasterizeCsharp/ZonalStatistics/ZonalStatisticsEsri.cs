@@ -229,7 +229,7 @@ namespace RasterizeCsharp.ZonalStatistics
 
                 //Export results
                 StatisticsExport writer = new StatisticsExport(outSummaryFile);
-                writer.ExportZonalStatistics2(ref rasInfoDict, outCellSize);
+                writer.ExportZonalStatistics(ref rasInfoDict, outCellSize);
 
             }
             else

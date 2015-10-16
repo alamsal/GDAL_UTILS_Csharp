@@ -138,7 +138,7 @@ namespace RasterizeCsharp.ZonalStatistics
             zoneRaster.Dispose();
 
             StatisticsExport writer = new StatisticsExport(_zoneFile);
-            writer.ExportZonalStatistics2(ref _rasInfoDict, _cellSize);
+            writer.ExportZonalStatistics(ref _rasInfoDict, _cellSize);
         }
     }
 }
