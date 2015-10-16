@@ -98,7 +98,7 @@ namespace RasterizeCsharp.ZonalIO
                             double sum = zonevalue.Value.Sum;
                             double mean = sum / count;
                             int bandInfo = bandCount + 1;
-                            double area = count * cellSize;
+                            double area = count * cellSize* cellSize;
                             var csvLine = string.Format("{0},{1},{2},{3},{4},{5}", bandInfo, value, count, area, mean, sum);
 
                             w.WriteLine(csvLine);
