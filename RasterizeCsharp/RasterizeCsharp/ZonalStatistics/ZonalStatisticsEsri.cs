@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using ESRI.ArcGIS.DataSourcesRaster;
 using ESRI.ArcGIS.Geodatabase;
-using ESRI.ArcGIS.Geoprocessor;
-using ESRI.ArcGIS.SpatialAnalystTools;
 using ESRI.ArcGIS.esriSystem;
 
 using RasterizeCsharp.RasterizeLayer;
@@ -14,88 +12,6 @@ namespace RasterizeCsharp.ZonalStatistics
 {
     class ZonalStatisticsEsri
     {
-        public static void ComputeZonalStatisticsFromEsri(string feature, string zoneField, string valueRaster, string outputTable)
-        {
-
-            ESRI.ArcGIS.RuntimeManager.Bind(ESRI.ArcGIS.ProductCode.Desktop);
-            ESRI.ArcGIS.RuntimeManager.BindLicense(ESRI.ArcGIS.ProductCode.Desktop);
-
-            UID pUid = new UIDClass();
-            pUid.Value = "esriSpatialAnalystUI.SAExtension";
-
-            // Add Spatial Analyst extension to the license manager.
-            object v = null;
-            IExtensionManagerAdmin extensionManagerAdmin = new ExtensionManagerClass();
-            extensionManagerAdmin.AddExtension(pUid, ref v);
-
-            // Enable the license.
-            IExtensionManager extensionManager = (IExtensionManager)extensionManagerAdmin;
-            IExtension extension = extensionManager.FindExtension(pUid);
-            IExtensionConfig extensionConfig = (IExtensionConfig)extension;
-
-
-
-            if (extensionConfig.State != esriExtensionState.esriESUnavailable)
-            {
-                extensionConfig.State = esriExtensionState.esriESEnabled;
-
-                Geoprocessor geoprocessor = new Geoprocessor();
-                geoprocessor.OverwriteOutput = true;
-
-                var zonalStatistics = new ZonalStatisticsAsTable
-                                                                {
-                                                                    in_value_raster = valueRaster,
-                                                                    zone_field = zoneField,
-                                                                    in_zone_data = feature,
-                                                                    out_table = outputTable
-                                                                };
-                try
-                {
-                    geoprocessor.Execute(zonalStatistics, null);
-                }
-                catch (Exception ex)
-                {
-                    object level = 0;
-                    Console.WriteLine(geoprocessor.GetMessages(ref level));
-                    Console.WriteLine(ex.Message);
-                }
-            }
-            else
-            {
-                Console.WriteLine("No Spatial Analyst License available");
-            }
-
-        }
-
-        private static void EnableEsriLiscences()
-        {
-            ESRI.ArcGIS.RuntimeManager.Bind(ESRI.ArcGIS.ProductCode.Desktop);
-            ESRI.ArcGIS.RuntimeManager.BindLicense(ESRI.ArcGIS.ProductCode.Desktop);
-
-            UID pUid = new UIDClass();
-            pUid.Value = "esriSpatialAnalystUI.SAExtension";
-
-            // Add Spatial Analyst extension to the license manager.
-            object v = null;
-            IExtensionManagerAdmin extensionManagerAdmin = new ExtensionManagerClass();
-            extensionManagerAdmin.AddExtension(pUid, ref v);
-
-            // Enable the license.
-            IExtensionManager extensionManager = (IExtensionManager)extensionManagerAdmin;
-            IExtension extension = extensionManager.FindExtension(pUid);
-            IExtensionConfig extensionConfig = (IExtensionConfig)extension;
-
-            if (extensionConfig.State != esriExtensionState.esriESUnavailable)
-            {
-                extensionConfig.State = esriExtensionState.esriESEnabled;
-            }
-            else
-            {
-                Console.WriteLine("No Spatial Analyst License available");
-            }
-
-        }
-
         public static void OpenFileRasterDataset(string inFolderName, string inRasterDatasetName, string inFeatureName, string inFieldName, double outCellSize, string outSummaryFile)
         {
             EnableEsriLiscences();
@@ -116,7 +32,7 @@ namespace RasterizeCsharp.ZonalStatistics
             string outClippedRasterName = "tempValueRasterFromESRI.tif";
             string outClippedValueRaster = inFolderName + "\\" + outClippedRasterName;
 
-            ClipRasterBoundaryEsri.ClipRaster(inValueRaster, inClipFeature , outClippedValueRaster);
+            ClipRasterBoundaryEsri.ClipRaster(inValueRaster, inClipFeature, outClippedValueRaster);
 
             //Open zone raster dataset
             IRasterDataset zoneRasterDataset = rasterWorkspace.OpenRasterDataset(outTempRasterName);
@@ -157,7 +73,7 @@ namespace RasterizeCsharp.ZonalStatistics
                     IPixelBlock3 zoneRasterPixelBlock3 = zoneRasterCursor.PixelBlock as IPixelBlock3;
 
                     //No Idea how esri cursor fills the raster gap if zone is greater than value, so quick and fix using smallest extent
-                    
+
                     int blockWidth = valueRasterPixelBlock3.Width < zoneRasterPixelBlock3.Width ? valueRasterPixelBlock3.Width : zoneRasterPixelBlock3.Width;
                     int blockHeight = valueRasterPixelBlock3.Height < zoneRasterPixelBlock3.Height ? valueRasterPixelBlock3.Height : zoneRasterPixelBlock3.Height;
 
@@ -183,9 +99,10 @@ namespace RasterizeCsharp.ZonalStatistics
                                     object pixelValueFromZone = null;
                                     try
                                     {
-                                         pixelValueFromValue = valueRasterPixels.GetValue(i, j);
-                                         pixelValueFromZone = zoneRasterPixels.GetValue(i, j);
-                                    }catch(Exception ex)
+                                        pixelValueFromValue = valueRasterPixels.GetValue(i, j);
+                                        pixelValueFromZone = zoneRasterPixels.GetValue(i, j);
+                                    }
+                                    catch (Exception ex)
                                     {
                                         Console.WriteLine(ex.Message);
                                     }
@@ -206,16 +123,17 @@ namespace RasterizeCsharp.ZonalStatistics
                                         {
                                             rasInfoDict[b][Convert.ToInt32(pixelValueFromZone)] = new StatisticsInfo() { Count = 1, Sum = Convert.ToDouble(pixelValueFromValue) };
                                         }
-                                    }catch(Exception ex)
+                                    }
+                                    catch (Exception ex)
                                     {
                                         Console.WriteLine(ex.Message);
                                     }
 
                                     //Console.WriteLine(i +"-"+j);
                                     //Console.WriteLine(pixelValueFromValue + "-" + pixelValueFromZone);
-                                    
 
-                                    
+
+
                                 }
                             }
                         }
@@ -237,7 +155,34 @@ namespace RasterizeCsharp.ZonalStatistics
                 Console.WriteLine("No band available in the Value Raster");
             }
 
+        }
 
+        private static void EnableEsriLiscences()
+        {
+            ESRI.ArcGIS.RuntimeManager.Bind(ESRI.ArcGIS.ProductCode.Desktop);
+            ESRI.ArcGIS.RuntimeManager.BindLicense(ESRI.ArcGIS.ProductCode.Desktop);
+
+            UID pUid = new UIDClass();
+            pUid.Value = "esriSpatialAnalystUI.SAExtension";
+
+            // Add Spatial Analyst extension to the license manager.
+            object v = null;
+            IExtensionManagerAdmin extensionManagerAdmin = new ExtensionManagerClass();
+            extensionManagerAdmin.AddExtension(pUid, ref v);
+
+            // Enable the license.
+            IExtensionManager extensionManager = (IExtensionManager)extensionManagerAdmin;
+            IExtension extension = extensionManager.FindExtension(pUid);
+            IExtensionConfig extensionConfig = (IExtensionConfig)extension;
+
+            if (extensionConfig.State != esriExtensionState.esriESUnavailable)
+            {
+                extensionConfig.State = esriExtensionState.esriESEnabled;
+            }
+            else
+            {
+                Console.WriteLine("No Spatial Analyst License available");
+            }
 
         }
 
