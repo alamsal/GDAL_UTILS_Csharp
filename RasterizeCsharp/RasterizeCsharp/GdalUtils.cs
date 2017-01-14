@@ -1,5 +1,6 @@
 ﻿using System;
 using RasterizeCsharp.ZonalStatistics;
+using RasterizeCsharp.ShapeField;
 
 namespace RasterizeCsharp
 {
@@ -11,7 +12,32 @@ namespace RasterizeCsharp
             //string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik\ns_lev05.shp";
             //string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik2\smallish dataset\polygons.shp";
             //string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\FromErik2\TEUI_5__Test_data\state_boundaries_us_100k.shp";
-            string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\UtahGrid\Counties.shp";
+            //string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\UtahGrid\Counties.shp";
+            string inputShapeFile = @"D:\Ashis_Work\GDAL Utilities\sample-data\Geodatabase\EsriZonalOutputs.gdb\Counties";
+
+
+            AttributeField attributeField = new AttributeField();
+            attributeField.AddAttributeField(inputShapeFile);
+
+             
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             string infieldName = "FIPS_STR";
             //string infieldName = "STATE_FIPS";
