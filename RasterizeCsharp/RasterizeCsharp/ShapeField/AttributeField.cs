@@ -49,11 +49,12 @@ namespace RasterizeCsharp.ShapeField
                     string featureName = Path.GetFileNameWithoutExtension(oldFeatureFile);
 
                     IWorkspaceFactory workspaceFactory = new FileGDBWorkspaceFactory();
-                    IFeatureWorkspace featureWorkspace = (IFeatureWorkspace)workspaceFactory.OpenFromFile(gdbPath, 0);
+                    IFeatureWorkspace featureWorkspace = (IFeatureWorkspace)workspaceFactory.OpenFromFile(gdbPath, 1);
                     IFeatureClass featureClass = featureWorkspace.OpenFeatureClass(featureName);
 
                     IFields fields = featureClass.Fields;
-                    if (fields.FindFieldByAliasName("FID_GDAL")== 0)
+                    
+                    if (fields.FindField("FID_GDAL") == -1)
                     {
                         // Create a Int field called "FID_GDAL" for the fields collection
                         IField gdalField = new FieldClass();
@@ -66,18 +67,23 @@ namespace RasterizeCsharp.ShapeField
 
                     }
 
+                    
 
                     IFeatureCursor featureCursor = featureClass.Search(null, false);
                     IFeature feature = featureCursor.NextFeature();
                     while (feature != null)
                     {
-                        feature.set_Value(feature.Fields.FindFieldByAliasName("FID_GDAL"), feature.OID); //  [feature.Fields.FindFieldByAliasName("FID_GDAL")]
-                        //feature = featureCursor.NextFeature();
                         Console.WriteLine(feature.OID);
+                        Console.WriteLine(feature.Fields.FindField("FID_GDAL"));
+                        
+                        
 
+                        feature.set_Value(feature.Fields.FindField("FID_GDAL"),feature.OID); //  [feature.Fields.FindFieldByAliasName("FID_GDAL")]
+                        feature.Store();
+                        Console.WriteLine(feature.OID);
                         feature = featureCursor.NextFeature();
                     }
-
+                    
                     featureCursor.Flush();
                     
                 }
