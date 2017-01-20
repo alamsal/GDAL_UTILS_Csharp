@@ -24,18 +24,26 @@ namespace RasterizeCsharp.ShapeField
             {
                 dataSource = Ogr.Open(oldFeatureFile, 1); //second argument in open specifies mode of data, 1 RW & 0 readonly mode
                 layer = dataSource.GetLayerByIndex(0);
-                
-                FieldDefn gdalFiedlDefn = new FieldDefn("FID_GDAL",FieldType.OFTInteger);
+                var layerDefn = layer.GetLayerDefn();
 
-                layer.CreateField(gdalFiedlDefn, 0);
-            
-                Feature feature = layer.GetNextFeature();
-                while (feature!= null)
+                int attrFieldIndex = (int)layerDefn.GetFieldIndex("FID_GDAL");
+                if (attrFieldIndex == -1)
                 {
-                    feature.SetField("FID_GDAL",feature.GetFID()); // Add FID shapefile
-                    layer.SetFeature(feature);
-                    feature = layer.GetNextFeature();
-                }
+                    FieldDefn gdalFiedlDefn = new FieldDefn("FID_GDAL", FieldType.OFTInteger);
+
+                    layer.CreateField(gdalFiedlDefn, 0);
+
+                    Feature feature = layer.GetNextFeature();
+
+                    while (feature != null)
+                    {
+                        feature.SetField("FID_GDAL", feature.GetFID()); // Add FID shapefile
+                        layer.SetFeature(feature);
+                        feature = layer.GetNextFeature();
+                    }
+                    layer.SyncToDisk();
+                  }
+                layer.Dispose();
                 dataSource.FlushCache();
 
             }
